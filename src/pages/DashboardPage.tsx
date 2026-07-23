@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createCalendar, deleteCalendar, listCalendars } from '../lib/calendarService';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar } from '../lib/types';
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [title, setTitle] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
@@ -28,10 +29,10 @@ export function DashboardPage() {
     e.preventDefault();
     if (!user || !title.trim()) return;
     setCreating(true);
-    await createCalendar(user.uid, title.trim(), year);
+    const calendar = await createCalendar(user.uid, title.trim(), year);
     setTitle('');
     setCreating(false);
-    await load();
+    navigate(`/app/c/${calendar.slug}/edit`);
   };
 
   const handleDelete = async (slug: string) => {

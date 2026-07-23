@@ -1,18 +1,61 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 8, 21);
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // A calendar's owner is stored on the calendar document.
+    function calendarOwner(slug) {
+      return get(/databases/$(database)/documents/calendars/$(slug)).data.ownerUid;
+    }
+
+    function ownsCalendar(slug) {
+      return isSignedIn() && calendarOwner(slug) == request.auth.uid;
+    }
+
+    // Creator profiles: only the user may read or write their own.
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Calendars are publicly readable (recipients open them without signing in).
+    // Only the authenticated owner may create/modify/delete their own calendar,
+    // and ownerUid can never be reassigned to someone else.
+    match /calendars/{slug} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if isSignedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+      allow delete: if isSignedIn()
+        && resource.data.ownerUid == request.auth.uid;
+
+      // Day content lives under the calendar. Public read for the soft-lock;
+      // writes are restricted to the owner of the parent calendar.
+      match /days/{dayNumber} {
+        allow read: if true;
+        allow write: if ownsCalendar(slug);
+      }
+    }
+
+    // Token -> {slug, dayNumber} lookup for per-day QR links. Public read so a
+    // scanned QR resolves without auth; writes gated to the owner of the
+    // referenced calendar.
+    match /dayLinks/{token} {
+      allow read: if true;
+      allow create: if ownsCalendar(request.resource.data.slug);
+      allow delete: if ownsCalendar(resource.data.slug);
+    }
+
+    // Stock adventure suggestions are read-only reference data; seeded out of
+    // band, never written from the client.
+    match /stockAdventures/{id} {
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

@@ -1,8 +1,14 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export function Layout() {
-  const { user, signOut } = useAuth();
+  const { user, signIn, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignIn = async () => {
+    await signIn();
+    navigate('/app');
+  };
 
   return (
     <div className="layout">
@@ -22,7 +28,9 @@ export function Layout() {
               </button>
             </>
           ) : (
-            <Link to="/">Home</Link>
+            <button type="button" className="btn linkish" onClick={handleSignIn}>
+              Sign in
+            </button>
           )}
         </nav>
       </header>

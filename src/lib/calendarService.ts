@@ -53,9 +53,12 @@ export async function createCalendar(ownerUid: string, title: string, year: numb
     updatedAt: now,
   };
 
-  const batch = writeBatch(db);
-  batch.set(doc(db, 'calendars', slug), calendar);
+  // The calendar document must be committed before its days/dayLinks so the
+  // Firestore ownership rules (which look up the parent calendar's ownerUid)
+  // can validate the child writes.
+  await setDoc(doc(db, 'calendars', slug), calendar);
 
+  const batch = writeBatch(db);
   for (let dayNumber = 1; dayNumber <= 24; dayNumber += 1) {
     const token = generateToken();
     const day: DayContent = {

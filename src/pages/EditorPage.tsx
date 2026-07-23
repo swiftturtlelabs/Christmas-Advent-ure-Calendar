@@ -7,6 +7,7 @@ import {
   updateCalendarTitle,
 } from '../lib/calendarService';
 import { applyStockAdventure, STOCK_ADVENTURES } from '../lib/stockAdventures';
+import { InfoTooltip } from '../components/InfoTooltip';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
 
@@ -150,7 +151,10 @@ export function EditorPage() {
             />
           </label>
           <label>
-            Early-unlock riddle prompt (optional)
+            <span className="label-row">
+              Early-unlock riddle prompt (optional)
+              <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
+            </span>
             <input
               value={draft.riddlePrompt ?? ''}
               onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
