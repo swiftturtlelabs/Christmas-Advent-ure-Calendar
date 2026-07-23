@@ -56,7 +56,7 @@ export function PublicCalendarPage() {
     <div className="page public-calendar">
       <Snowfall />
       <header className="public-header">
-        <h1>{calendar.title}</h1>
+        <h1>🎄 {calendar.title}</h1>
         <p>Christmas Advent-ure Calendar {calendar.year}</p>
       </header>
       <div className="public-day-grid">

@@ -42,10 +42,10 @@ export function DashboardPage() {
 
   return (
     <div className="page dashboard">
-      <h1>My Calendars</h1>
+      <h1>🎁 My Calendars</h1>
 
       <form className="card create-form" onSubmit={handleCreate}>
-        <h2>Create a new calendar</h2>
+        <h2>✨ Create a new calendar</h2>
         <label>
           Title
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Smith Family 2026" required />
@@ -73,16 +73,16 @@ export function DashboardPage() {
               </div>
               <div className="calendar-actions">
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/edit`}>
-                  Edit
+                  ✏️ Edit
                 </Link>
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/qr`}>
-                  QR codes
+                  📱 QR codes
                 </Link>
                 <Link className="btn secondary" to={`/c/${cal.slug}`} target="_blank">
-                  Preview
+                  👀 Preview
                 </Link>
                 <button type="button" className="btn danger" onClick={() => handleDelete(cal.slug)}>
-                  Delete
+                  🗑️ Delete
                 </button>
               </div>
             </li>

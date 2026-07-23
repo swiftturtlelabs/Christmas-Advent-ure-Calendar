@@ -40,9 +40,9 @@ export function PublicDayPage() {
       <div className="page public-day locked-view">
         <Snowfall />
         <div className="card day-card">
-          <h1>Day {day.dayNumber}</h1>
+          <h1>🔒 Day {day.dayNumber}</h1>
           <p>Not yet! This adventure opens on December {day.dayNumber}.</p>
-          <Link to={`/c/${calendar.slug}`}>Back to calendar</Link>
+          <Link to={`/c/${calendar.slug}`}>← Back to calendar</Link>
         </div>
       </div>
     );

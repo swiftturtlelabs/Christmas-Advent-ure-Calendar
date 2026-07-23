@@ -6,6 +6,8 @@ interface Flake {
   radius: number;
   speed: number;
   drift: number;
+  opacity: number;
+  twinklePhase: number;
 }
 
 export function Snowfall() {
@@ -32,18 +34,26 @@ export function Snowfall() {
         flakes.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          radius: Math.random() * 2.5 + 1,
+          radius: Math.random() * 2.8 + 1,
           speed: Math.random() * 1.5 + 0.5,
           drift: Math.random() * 0.6 - 0.3,
+          opacity: Math.random() * 0.5 + 0.5,
+          twinklePhase: Math.random() * Math.PI * 2,
         });
       }
     };
 
+    let tick = 0;
+
     const draw = () => {
+      tick += 1;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
       flakes.forEach((flake) => {
+        const twinkle = 0.75 + 0.25 * Math.sin(tick * 0.03 + flake.twinklePhase);
         ctx.beginPath();
+        ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity * twinkle})`;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        ctx.shadowBlur = flake.radius * 1.5;
         ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
         ctx.fill();
         flake.y += flake.speed;

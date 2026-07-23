@@ -60,9 +60,9 @@ export function QrExportPage() {
     <div className="page qr-export">
       <div className="editor-header">
         <Link to={`/app/c/${slug}/edit`}>← Back to editor</Link>
-        <h1>QR codes — {calendar.title}</h1>
+        <h1>📱 QR codes — {calendar.title}</h1>
         <button type="button" className="btn primary print-hide" onClick={printSheet}>
-          Print sheet
+          🖨️ Print sheet
         </button>
       </div>
       <p className="muted print-hide">
