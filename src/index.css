@@ -474,8 +474,6 @@ textarea:focus {
 .day-pick.active,
 .day-pick.active.filled {
   border-color: var(--gold-500);
-  background: #fff4c8;
-  color: #6b5200;
   box-shadow: 0 4px 12px rgba(224, 168, 37, 0.35);
 }
 
