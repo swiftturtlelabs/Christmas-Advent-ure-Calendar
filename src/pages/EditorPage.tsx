@@ -35,15 +35,16 @@ export function EditorPage() {
       const [cal, dayList] = await Promise.all([getCalendar(slug), getDays(slug)]);
       setCalendar(cal);
       setDays(dayList);
-      const first = dayList.find((d) => d.dayNumber === 1) ?? dayList[0];
-      if (first) {
-        setSelectedDay(first.dayNumber);
+      const earliestUnset = dayList.find((d) => !d.message?.trim());
+      const initial = earliestUnset ?? dayList.find((d) => d.dayNumber === 1) ?? dayList[0];
+      if (initial) {
+        setSelectedDay(initial.dayNumber);
         setDraft({
-          title: first.title,
-          message: first.message,
-          imageUrl: first.imageUrl,
-          riddlePrompt: first.riddlePrompt,
-          sourceStockId: first.sourceStockId,
+          title: initial.title,
+          message: initial.message,
+          imageUrl: initial.imageUrl,
+          riddlePrompt: initial.riddlePrompt,
+          sourceStockId: initial.sourceStockId,
         });
       }
     })();
