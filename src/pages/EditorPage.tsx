@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   getCalendar,
   getDays,
@@ -16,6 +17,20 @@ import { InfoTooltip } from '../components/InfoTooltip';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
+
+function draftFromDay(day: DayContent): DayDraft {
+  return {
+    title: day.title,
+    message: day.message,
+    imageUrl: day.imageUrl,
+    riddlePrompt: day.riddlePrompt,
+    sourceStockId: day.sourceStockId,
+  };
+}
+
+function isDaySetup(day: { message?: string }): boolean {
+  return Boolean(day.message?.trim());
+}
 
 export function EditorPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -37,17 +52,11 @@ export function EditorPage() {
       const [cal, dayList] = await Promise.all([getCalendar(slug), getDays(slug)]);
       setCalendar(cal);
       setDays(dayList);
-      const earliestUnset = dayList.find((d) => !d.message?.trim());
+      const earliestUnset = dayList.find((d) => !isDaySetup(d));
       const initial = earliestUnset ?? dayList.find((d) => d.dayNumber === 1) ?? dayList[0];
       if (initial) {
         setSelectedDay(initial.dayNumber);
-        setDraft({
-          title: initial.title,
-          message: initial.message,
-          imageUrl: initial.imageUrl,
-          riddlePrompt: initial.riddlePrompt,
-          sourceStockId: initial.sourceStockId,
-        });
+        setDraft(draftFromDay(initial));
       }
     })();
   }, [slug]);
@@ -55,20 +64,18 @@ export function EditorPage() {
   useEffect(() => {
     const day = days.find((d) => d.dayNumber === selectedDay);
     if (day) {
-      setDraft({
-        title: day.title,
-        message: day.message,
-        imageUrl: day.imageUrl,
-        riddlePrompt: day.riddlePrompt,
-        sourceStockId: day.sourceStockId,
-      });
+      setDraft(draftFromDay(day));
     }
+    setShowMoreFields(false);
   }, [selectedDay, days]);
 
   const usedStockIds = useMemo(() => collectUsedStockIds(days), [days]);
   const rankedSuggestions = useMemo(
     () => rankSuggestions(STOCK_ADVENTURES, selectedDay, usedStockIds),
     [selectedDay, usedStockIds],
+  );
+  const selectedIsSetup = isDaySetup(
+    days.find((d) => d.dayNumber === selectedDay) ?? { message: '' },
   );
 
   if (!slug || !calendar) {
@@ -78,6 +85,20 @@ export function EditorPage() {
   if (user && calendar.ownerUid !== user.uid) {
     return <div className="page">You do not have access to edit this calendar.</div>;
   }
+
+  const selectDay = (dayNumber: number) => {
+    setSelectedDay(dayNumber);
+    setMessage('');
+    setSaveFailed(false);
+  };
+
+  const goToAdjacentDay = (delta: number) => {
+    if (days.length === 0) return;
+    const sorted = [...days].sort((a, b) => a.dayNumber - b.dayNumber);
+    const idx = sorted.findIndex((d) => d.dayNumber === selectedDay);
+    const next = sorted[(idx + delta + sorted.length) % sorted.length];
+    if (next) selectDay(next.dayNumber);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +110,15 @@ export function EditorPage() {
       await saveDay(slug, user.uid, selectedDay, draft);
       const refreshed = await getDays(slug);
       setDays(refreshed);
-      setMessage('Saved!');
+      const nextUnset =
+        refreshed.find((d) => d.dayNumber > selectedDay && !isDaySetup(d)) ??
+        refreshed.find((d) => !isDaySetup(d));
+      if (nextUnset && nextUnset.dayNumber !== selectedDay) {
+        setSelectedDay(nextUnset.dayNumber);
+        setMessage(`Saved! Going to day ${nextUnset.dayNumber}.`);
+      } else {
+        setMessage('Saved!');
+      }
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'Unknown error';
       setSaveFailed(true);
@@ -167,24 +196,47 @@ export function EditorPage() {
               <button
                 key={day.dayNumber}
                 type="button"
-                className={`day-pick ${selectedDay === day.dayNumber ? 'active' : ''} ${day.message ? 'filled' : ''}`}
-                onClick={() => setSelectedDay(day.dayNumber)}
+                className={`day-pick ${selectedDay === day.dayNumber ? 'active' : ''} ${isDaySetup(day) ? 'filled' : ''}`}
+                onClick={() => selectDay(day.dayNumber)}
               >
                 {day.dayNumber}
               </button>
             ))}
           </div>
-          <button
-            type="button"
-            className="btn primary get-suggestions-btn"
-            onClick={() => setShowSuggestions(true)}
-          >
-            Get suggestions
-          </button>
         </div>
 
         <form className="card day-form" onSubmit={handleSave}>
-          <h2>Day {selectedDay}</h2>
+          <div className="day-form-header">
+            <div className="day-stepper">
+              <button
+                type="button"
+                className="day-stepper-btn"
+                aria-label="Previous day"
+                onClick={() => goToAdjacentDay(-1)}
+              >
+                <ChevronLeft size={22} strokeWidth={2.4} />
+              </button>
+              <h2 className={`day-form-heading ${selectedIsSetup ? 'filled' : 'unset'}`}>
+                Day {selectedDay}
+              </h2>
+              <button
+                type="button"
+                className="day-stepper-btn"
+                aria-label="Next day"
+                onClick={() => goToAdjacentDay(1)}
+              >
+                <ChevronRight size={22} strokeWidth={2.4} />
+              </button>
+            </div>
+            <button
+              type="button"
+              className="btn secondary get-suggestions-btn"
+              onClick={() => setShowSuggestions(true)}
+            >
+              Get suggestions
+            </button>
+          </div>
+
           <label>
             Title
             <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} required />
@@ -205,6 +257,11 @@ export function EditorPage() {
               aria-expanded={showMoreFields}
               onClick={() => setShowMoreFields((open) => !open)}
             >
+              <ChevronDown
+                size={18}
+                strokeWidth={2.4}
+                className={`more-fields-chevron ${showMoreFields ? 'open' : ''}`}
+              />
               {showMoreFields ? 'Less' : 'More'}
             </button>
             {showMoreFields && (

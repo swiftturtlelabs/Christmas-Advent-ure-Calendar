@@ -441,11 +441,64 @@ textarea:focus {
   display: grid;
   grid-template-columns: 220px 1fr;
   gap: 1.25rem;
+  align-items: start;
+}
+
+.day-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.day-form-header .day-form-heading,
+.day-stepper {
+  margin: 0;
+}
+
+.day-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.day-stepper-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 2px solid #d7e5dc;
+  border-radius: 999px;
+  background: white;
+  color: var(--pine-800);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.day-stepper-btn:hover {
+  border-color: var(--gold-500);
+  background: #fff8e4;
+}
+
+.day-form-heading {
+  margin: 0;
+}
+
+.day-form-heading.unset {
+  color: var(--holly-700);
+}
+
+.day-form-heading.filled {
+  color: var(--pine-800);
 }
 
 .get-suggestions-btn {
-  width: 100%;
-  margin-top: 1rem;
+  flex-shrink: 0;
 }
 
 .day-picker-grid,
@@ -600,6 +653,10 @@ textarea:focus {
   gap: 0.5rem;
 }
 
+.calendar-title-card {
+  margin-bottom: 1.25rem;
+}
+
 .calendar-title-display {
   align-items: center;
   justify-content: space-between;
@@ -619,28 +676,46 @@ textarea:focus {
 .more-fields {
   display: grid;
   gap: 0.85rem;
+  margin: 0.35rem 0 1.25rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid #d7e5dc;
+  border-bottom: 1px solid #d7e5dc;
 }
 
 .more-fields-toggle {
   justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   border: none;
   background: none;
-  padding: 0;
+  padding: 0.25rem 0;
   color: var(--pine-700);
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
 }
 
 .more-fields-toggle:hover {
   color: var(--holly-600);
 }
 
+.more-fields-chevron {
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.more-fields-chevron.open {
+  transform: rotate(180deg);
+}
+
 .more-fields-body {
   display: grid;
   gap: 0.85rem;
+}
+
+.more-fields-body label {
+  margin-bottom: 0;
 }
 
 .label-row {
@@ -973,6 +1048,69 @@ textarea:focus {
   .editor-grid {
     grid-template-columns: 1fr;
   }
+
+  .day-picker {
+    display: none;
+  }
+
+  .day-stepper-btn {
+    display: inline-flex;
+  }
+
+  .page.editor {
+    padding-bottom: 1rem;
+  }
+
+  .page.editor .editor-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .page.editor .editor-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .page.editor .calendar-title-card {
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page.editor .calendar-title-text {
+    font-size: 1.15rem;
+  }
+
+  .page.editor .day-form {
+    padding: 1rem;
+  }
+
+  .page.editor .day-form-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .page.editor .day-form textarea {
+    min-height: 6.5rem;
+  }
+
+  .page.editor .day-form label {
+    margin-bottom: 0.75rem;
+  }
+
+  .page.editor .get-suggestions-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .page.editor .day-form-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page.editor .day-stepper {
+    justify-content: space-between;
+  }
+
+  .page.editor .day-form-heading {
+    flex: 1;
+  }
 }
 
 @media (max-width: 520px) {
@@ -990,6 +1128,11 @@ textarea:focus {
 
   .hero {
     padding: 1.75rem 1.25rem;
+  }
+
+  .page.editor .editor-header-actions .btn {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.85rem;
   }
 }
 
