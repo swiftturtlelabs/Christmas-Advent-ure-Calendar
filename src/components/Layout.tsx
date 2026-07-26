@@ -14,9 +14,6 @@ export function Layout() {
     <div className="layout">
       <header className="site-header">
         <Link to="/" className="brand">
-          <span className="brand-icon" aria-hidden="true">
-            🎄
-          </span>
           Christmas Advent-ure Calendar
         </Link>
         <nav>

@@ -1,3 +1,4 @@
+import { CalendarDays, Lightbulb, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -84,7 +85,10 @@ export function EditorPage() {
     <div className="page editor">
       <div className="editor-header">
         <Link to="/app">← Back</Link>
-        <h1>🛠️ Edit calendar</h1>
+        <h1>
+          <Wrench className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+          Edit calendar
+        </h1>
         <div className="editor-header-actions">
           <Link className="btn secondary" to={`/app/c/${slug}/qr`}>
             QR codes
@@ -112,7 +116,10 @@ export function EditorPage() {
 
       <div className="editor-grid">
         <div className="day-picker card">
-          <h2>📅 Days</h2>
+          <h2>
+            <CalendarDays className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+            Days
+          </h2>
           <div className="day-picker-grid">
             {days.map((day) => (
               <button
@@ -176,7 +183,10 @@ export function EditorPage() {
         </form>
 
         <div className="card stock-panel">
-          <h2>💡 Stock adventures</h2>
+          <h2>
+            <Lightbulb className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+            Stock adventures
+          </h2>
           <p className="muted">Tap to apply inspiration to Day {selectedDay}.</p>
           <ul className="stock-list">
             {stock.map((item) => (

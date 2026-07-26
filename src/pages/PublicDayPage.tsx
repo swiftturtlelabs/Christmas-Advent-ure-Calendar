@@ -1,3 +1,4 @@
+import { Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Snowfall } from '../components/Snowfall';
@@ -40,7 +41,10 @@ export function PublicDayPage() {
       <div className="page public-day locked-view">
         <Snowfall />
         <div className="card day-card">
-          <h1>🔒 Day {day.dayNumber}</h1>
+          <h1>
+            <Lock className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+            Day {day.dayNumber}
+          </h1>
           <p>Not yet! This adventure opens on December {day.dayNumber}.</p>
           <Link to={`/c/${calendar.slug}`}>← Back to calendar</Link>
         </div>

@@ -1,3 +1,4 @@
+import { Lock, Star } from 'lucide-react';
 import { countdownLabel, isDayUnlocked } from '../lib/dateLock';
 import type { DayContent } from '../lib/types';
 
@@ -29,7 +30,11 @@ export function DayTile({ day, year, unlockedOverride, onOpen, onLockedClick }: 
       aria-label={`Day ${day.dayNumber}${unlocked ? '' : ', locked'}`}
     >
       <span className="day-tile-icon" aria-hidden="true">
-        {unlocked ? '⭐' : '🔒'}
+        {unlocked ? (
+          <Star strokeWidth={1.75} fill="currentColor" fillOpacity={0.25} />
+        ) : (
+          <Lock strokeWidth={1.75} />
+        )}
       </span>
       <span className="day-number">{day.dayNumber}</span>
       {!unlocked && <span className="day-hint">{countdownLabel(day.dayNumber, new Date(), year)}</span>}

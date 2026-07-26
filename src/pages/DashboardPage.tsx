@@ -1,3 +1,4 @@
+import { Eye, Gift, Pencil, QrCode, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createCalendar, deleteCalendar, listCalendars } from '../lib/calendarService';
@@ -43,10 +44,16 @@ export function DashboardPage() {
 
   return (
     <div className="page dashboard">
-      <h1>🎁 My Calendars</h1>
+      <h1>
+        <Gift className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+        My Calendars
+      </h1>
 
       <form className="card create-form" onSubmit={handleCreate}>
-        <h2>✨ Create a new calendar</h2>
+        <h2>
+          <Sparkles className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
+          Create a new calendar
+        </h2>
         <label>
           Title
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Smith Family 2026" required />
@@ -74,16 +81,20 @@ export function DashboardPage() {
               </div>
               <div className="calendar-actions">
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/edit`}>
-                  ✏️ Edit
+                  <Pencil className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
+                  Edit
                 </Link>
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/qr`}>
-                  📱 QR codes
+                  <QrCode className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
+                  QR codes
                 </Link>
                 <Link className="btn secondary" to={`/c/${cal.slug}`} target="_blank">
-                  👀 Preview
+                  <Eye className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
+                  Preview
                 </Link>
                 <button type="button" className="btn danger" onClick={() => handleDelete(cal.slug)}>
-                  🗑️ Delete
+                  <Trash2 className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
+                  Delete
                 </button>
               </div>
             </li>

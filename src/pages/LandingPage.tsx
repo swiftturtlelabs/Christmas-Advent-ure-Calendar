@@ -1,3 +1,4 @@
+import { CalendarDays, Gift, Puzzle, Smartphone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Snowfall } from '../components/Snowfall';
 
@@ -13,7 +14,10 @@ export function LandingPage() {
     <div className="page landing">
       <Snowfall />
       <div className="hero card">
-        <span className="hero-badge">🎁 24 days of magic</span>
+        <span className="hero-badge">
+          <Gift size={14} strokeWidth={2} aria-hidden="true" />
+          24 days of magic
+        </span>
         <h1>Christmas Advent-ure Calendar</h1>
         <p>
           Create a personalized 24-day Christmas adventure for your family and friends.
@@ -21,15 +25,15 @@ export function LandingPage() {
         </p>
         <div className="feature-grid">
           <div className="feature-chip">
-            <span className="feature-icon">🗓️</span>
+            <CalendarDays className="feature-icon" strokeWidth={1.75} aria-hidden="true" />
             Daily surprises
           </div>
           <div className="feature-chip">
-            <span className="feature-icon">🧩</span>
+            <Puzzle className="feature-icon" strokeWidth={1.75} aria-hidden="true" />
             Secret riddles
           </div>
           <div className="feature-chip">
-            <span className="feature-icon">📱</span>
+            <Smartphone className="feature-icon" strokeWidth={1.75} aria-hidden="true" />
             Shareable QR codes
           </div>
         </div>
