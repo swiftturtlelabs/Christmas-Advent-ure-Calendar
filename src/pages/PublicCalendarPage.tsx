@@ -1,4 +1,3 @@
-import { TreePine } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DayTile } from '../components/DayTile';
@@ -57,10 +56,7 @@ export function PublicCalendarPage() {
     <div className="page public-calendar">
       <Snowfall />
       <header className="public-header">
-        <h1>
-          <TreePine className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
-          {calendar.title}
-        </h1>
+        <h1>{calendar.title}</h1>
         <p>Christmas Advent-ure Calendar {calendar.year}</p>
       </header>
       <div className="public-day-grid">

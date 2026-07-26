@@ -1,4 +1,4 @@
-import { Eye, Gift, Pencil, QrCode, Sparkles, Trash2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createCalendar, deleteCalendar, listCalendars } from '../lib/calendarService';
@@ -13,6 +13,7 @@ export function DashboardPage() {
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
   const load = async () => {
     if (!user) return;
@@ -42,30 +43,41 @@ export function DashboardPage() {
     await load();
   };
 
+  const createExpanded = !loading && (calendars.length === 0 || showCreate);
+
   return (
     <div className="page dashboard">
-      <h1>
-        <Gift className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
-        My Calendars
-      </h1>
+      <div className="dashboard-header">
+        <h1>My Calendars</h1>
+        {!loading && calendars.length > 0 && (
+          <button
+            type="button"
+            className="btn secondary"
+            onClick={() => setShowCreate((open) => !open)}
+            aria-expanded={showCreate}
+          >
+            <Plus className="btn-icon" strokeWidth={2} aria-hidden="true" />
+            Add calendar
+          </button>
+        )}
+      </div>
 
-      <form className="card create-form" onSubmit={handleCreate}>
-        <h2>
-          <Sparkles className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
-          Create a new calendar
-        </h2>
-        <label>
-          Title
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Smith Family 2026" required />
-        </label>
-        <label>
-          Year
-          <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} min={2020} max={2100} />
-        </label>
-        <button type="submit" className="btn primary" disabled={creating}>
-          {creating ? 'Creating…' : 'Create calendar'}
-        </button>
-      </form>
+      {createExpanded && (
+        <form className="card create-form" onSubmit={handleCreate}>
+          <h2>Create a new calendar</h2>
+          <label>
+            Title
+            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Smith Family 2026" required />
+          </label>
+          <label>
+            Year
+            <input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} min={2020} max={2100} />
+          </label>
+          <button type="submit" className="btn primary" disabled={creating}>
+            {creating ? 'Creating…' : 'Create calendar'}
+          </button>
+        </form>
+      )}
 
       {loading ? (
         <p>Loading calendars…</p>
@@ -81,19 +93,15 @@ export function DashboardPage() {
               </div>
               <div className="calendar-actions">
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/edit`}>
-                  <Pencil className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
                   Edit
                 </Link>
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/qr`}>
-                  <QrCode className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
                   QR codes
                 </Link>
                 <Link className="btn secondary" to={`/c/${cal.slug}`} target="_blank">
-                  <Eye className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
                   Preview
                 </Link>
                 <button type="button" className="btn danger" onClick={() => handleDelete(cal.slug)}>
-                  <Trash2 className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
                   Delete
                 </button>
               </div>

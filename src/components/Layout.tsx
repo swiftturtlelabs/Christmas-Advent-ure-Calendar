@@ -6,8 +6,8 @@ export function Layout() {
   const navigate = useNavigate();
 
   const handleSignIn = async () => {
-    await signIn();
-    navigate('/app');
+    const ok = await signIn();
+    if (ok) navigate('/app');
   };
 
   return (

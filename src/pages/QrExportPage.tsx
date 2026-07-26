@@ -1,4 +1,3 @@
-import { Printer, QrCode as QrCodeIcon } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -61,12 +60,8 @@ export function QrExportPage() {
     <div className="page qr-export">
       <div className="editor-header">
         <Link to={`/app/c/${slug}/edit`}>← Back to editor</Link>
-        <h1>
-          <QrCodeIcon className="heading-icon" strokeWidth={1.75} aria-hidden="true" />
-          QR codes — {calendar.title}
-        </h1>
+        <h1>QR codes — {calendar.title}</h1>
         <button type="button" className="btn primary print-hide" onClick={printSheet}>
-          <Printer className="btn-icon" strokeWidth={1.75} aria-hidden="true" />
           Print sheet
         </button>
       </div>

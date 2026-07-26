@@ -19,7 +19,7 @@ interface AuthContextValue {
   signingIn: boolean;
   authError: string | null;
   configError: string | null;
-  signIn: () => Promise<void>;
+  signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
   clearAuthError: () => void;
 }
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: async () => {
         if (firebaseConfigError) {
           setAuthError(firebaseConfigError);
-          return;
+          return false;
         }
 
         setAuthError(null);
@@ -95,19 +95,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           await signInWithPopup(auth, googleProvider);
           setSigningIn(false);
+          return true;
         } catch (error) {
           if (isPopupFallbackError(error)) {
             try {
               await signInWithRedirect(auth, googleProvider);
-              return;
+              return false;
             } catch (redirectError) {
               setSigningIn(false);
               setAuthError(getAuthErrorMessage(redirectError));
-              return;
+              return false;
             }
           }
           setSigningIn(false);
           setAuthError(getAuthErrorMessage(error));
+          return false;
         }
       },
       signOut: async () => {
