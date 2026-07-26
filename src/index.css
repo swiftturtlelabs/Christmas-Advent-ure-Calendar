@@ -471,21 +471,17 @@ textarea:focus {
   transform: translateY(-1px);
 }
 
-.day-pick.active {
-  border-color: var(--holly-700);
-  background: #f8c4c4;
-  box-shadow: 0 4px 12px rgba(214, 59, 59, 0.3);
+.day-pick.active,
+.day-pick.active.filled {
+  border-color: var(--gold-500);
+  background: #fff4c8;
+  color: #6b5200;
+  box-shadow: 0 4px 12px rgba(224, 168, 37, 0.35);
 }
 
 .day-pick.filled {
   border-color: #d7e5dc;
   background: #e7f6ee;
-  color: var(--ink-900);
-}
-
-.day-pick.active.filled {
-  border-color: var(--holly-500);
-  background: linear-gradient(135deg, #ffe9e3, #e7f6ee);
   color: var(--ink-900);
 }
 
