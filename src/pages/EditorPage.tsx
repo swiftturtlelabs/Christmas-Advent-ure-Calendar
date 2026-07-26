@@ -28,6 +28,7 @@ export function EditorPage() {
   const [message, setMessage] = useState('');
   const [saveFailed, setSaveFailed] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -107,6 +108,7 @@ export function EditorPage() {
     if (!user) return;
     try {
       await updateCalendarTitle(slug, user.uid, calendar.title);
+      setEditingTitle(false);
       setSaveFailed(false);
       setMessage('Calendar title saved.');
     } catch (err) {
@@ -131,19 +133,29 @@ export function EditorPage() {
         </div>
       </div>
 
-      <div className="card">
-        <label>
-          Calendar title
-          <div className="inline-field">
-            <input
-              value={calendar.title}
-              onChange={(e) => setCalendar({ ...calendar, title: e.target.value })}
-            />
-            <button type="button" className="btn secondary" onClick={handleTitleSave}>
-              Save title
+      <div className="card calendar-title-card">
+        {editingTitle ? (
+          <label>
+            Calendar title
+            <div className="inline-field">
+              <input
+                value={calendar.title}
+                onChange={(e) => setCalendar({ ...calendar, title: e.target.value })}
+                autoFocus
+              />
+              <button type="button" className="btn secondary" onClick={handleTitleSave}>
+                Save
+              </button>
+            </div>
+          </label>
+        ) : (
+          <div className="inline-field calendar-title-display">
+            <h2 className="calendar-title-text">{calendar.title}</h2>
+            <button type="button" className="btn secondary" onClick={() => setEditingTitle(true)}>
+              Edit Title
             </button>
           </div>
-        </label>
+        )}
       </div>
 
       <div className="editor-grid">

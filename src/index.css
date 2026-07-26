@@ -600,6 +600,22 @@ textarea:focus {
   gap: 0.5rem;
 }
 
+.calendar-title-display {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.calendar-title-text {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  color: var(--pine-900);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 .label-row {
   display: inline-flex;
   align-items: center;
