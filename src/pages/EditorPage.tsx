@@ -29,6 +29,7 @@ export function EditorPage() {
   const [saveFailed, setSaveFailed] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
+  const [showMoreFields, setShowMoreFields] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -197,33 +198,47 @@ export function EditorPage() {
               placeholder="Describe today's Christmas adventure…"
             />
           </label>
-          <label>
-            Image URL (optional)
-            <input
-              value={draft.imageUrl ?? ''}
-              onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })}
-              placeholder="https://…"
-            />
-          </label>
-          <label>
-            <span className="label-row">
-              Early-unlock riddle prompt (optional)
-              <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
-            </span>
-            <input
-              value={draft.riddlePrompt ?? ''}
-              onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
-              placeholder="What do reindeer say?"
-            />
-          </label>
-          <label>
-            Riddle answer (optional — leave blank to keep current)
-            <input
-              value={draft.answer ?? ''}
-              onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
-              placeholder="Set a new answer to change it"
-            />
-          </label>
+          <div className="more-fields">
+            <button
+              type="button"
+              className="more-fields-toggle"
+              aria-expanded={showMoreFields}
+              onClick={() => setShowMoreFields((open) => !open)}
+            >
+              {showMoreFields ? 'Less' : 'More'}
+            </button>
+            {showMoreFields && (
+              <div className="more-fields-body">
+                <label>
+                  Image URL (optional)
+                  <input
+                    value={draft.imageUrl ?? ''}
+                    onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })}
+                    placeholder="https://…"
+                  />
+                </label>
+                <label>
+                  <span className="label-row">
+                    Early-unlock riddle prompt (optional)
+                    <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
+                  </span>
+                  <input
+                    value={draft.riddlePrompt ?? ''}
+                    onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
+                    placeholder="What do reindeer say?"
+                  />
+                </label>
+                <label>
+                  Riddle answer (optional — leave blank to keep current)
+                  <input
+                    value={draft.answer ?? ''}
+                    onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
+                    placeholder="Set a new answer to change it"
+                  />
+                </label>
+              </div>
+            )}
+          </div>
           <button type="submit" className="btn primary" disabled={saving}>
             {saving ? 'Saving…' : 'Save day'}
           </button>

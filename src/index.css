@@ -616,6 +616,33 @@ textarea:focus {
   word-break: break-word;
 }
 
+.more-fields {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.more-fields-toggle {
+  justify-self: start;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--pine-700);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.more-fields-toggle:hover {
+  color: var(--holly-600);
+}
+
+.more-fields-body {
+  display: grid;
+  gap: 0.85rem;
+}
+
 .label-row {
   display: inline-flex;
   align-items: center;
