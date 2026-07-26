@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -8,6 +9,7 @@ import {
   where,
   writeBatch,
   type DocumentData,
+  type UpdateData,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { generateSalt, hashAnswer } from './riddle';
@@ -129,30 +131,54 @@ export async function saveDay(
 
   const dayRef = doc(db, 'calendars', slug, 'days', String(dayNumber));
   const existing = (await getDoc(dayRef)).data() as DayContent | undefined;
+  const token = existing?.token ?? generateToken();
 
-  let answerHash = existing?.answerHash;
-  let answerSalt = existing?.answerSalt;
-  if (draft.answer?.trim()) {
-    answerSalt = generateSalt();
-    answerHash = await hashAnswer(draft.answer, answerSalt);
-  } else if (draft.answer === '') {
-    answerHash = undefined;
-    answerSalt = undefined;
-  }
-
-  const updated: DayContent = {
+  // Firestore rejects `undefined` field values, so optional fields are either
+  // set to a real value or removed with deleteField() — never undefined.
+  const updated: UpdateData<DayContent> = {
     dayNumber,
     title: draft.title,
     message: draft.message,
-    imageUrl: draft.imageUrl || undefined,
-    riddlePrompt: draft.riddlePrompt || undefined,
-    answerHash,
-    answerSalt,
-    token: existing?.token ?? generateToken(),
+    token,
     updatedAt: new Date().toISOString(),
   };
 
+  const imageUrl = draft.imageUrl?.trim();
+  if (imageUrl) {
+    updated.imageUrl = imageUrl;
+  } else if (existing?.imageUrl) {
+    updated.imageUrl = deleteField();
+  }
+
+  const riddlePrompt = draft.riddlePrompt?.trim();
+  if (riddlePrompt) {
+    updated.riddlePrompt = riddlePrompt;
+  } else if (existing?.riddlePrompt) {
+    updated.riddlePrompt = deleteField();
+  }
+
+  if (draft.answer?.trim()) {
+    const answerSalt = generateSalt();
+    updated.answerSalt = answerSalt;
+    updated.answerHash = await hashAnswer(draft.answer, answerSalt);
+  } else if (draft.answer === '') {
+    updated.answerHash = deleteField();
+    updated.answerSalt = deleteField();
+  }
+
+  const sourceStockId = draft.sourceStockId?.trim();
+  if (sourceStockId) {
+    updated.sourceStockId = sourceStockId;
+  } else if (existing?.sourceStockId) {
+    updated.sourceStockId = deleteField();
+  }
+
   await setDoc(dayRef, updated, { merge: true });
+
+  // Days created outside createCalendar still need a QR lookup entry.
+  if (!existing?.token) {
+    await setDoc(doc(db, 'dayLinks', token), { slug, dayNumber });
+  }
 }
 
 export async function seedStockAdventuresIfEmpty(): Promise<void> {

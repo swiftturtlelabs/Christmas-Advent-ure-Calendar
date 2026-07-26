@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   getCalendar,
@@ -6,8 +6,14 @@ import {
   saveDay,
   updateCalendarTitle,
 } from '../lib/calendarService';
-import { applyStockAdventure, STOCK_ADVENTURES } from '../lib/stockAdventures';
+import {
+  applyStockAdventure,
+  collectUsedStockIds,
+  rankSuggestions,
+  STOCK_ADVENTURES,
+} from '../lib/stockAdventures';
 import { InfoTooltip } from '../components/InfoTooltip';
+import { SuggestionsModal } from '../components/SuggestionsModal';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
 
@@ -18,9 +24,10 @@ export function EditorPage() {
   const [days, setDays] = useState<DayContent[]>([]);
   const [selectedDay, setSelectedDay] = useState(1);
   const [draft, setDraft] = useState<DayDraft>({ title: '', message: '' });
-  const [stock, setStock] = useState<StockAdventure[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -28,11 +35,16 @@ export function EditorPage() {
       const [cal, dayList] = await Promise.all([getCalendar(slug), getDays(slug)]);
       setCalendar(cal);
       setDays(dayList);
-      setStock(STOCK_ADVENTURES);
       const first = dayList.find((d) => d.dayNumber === 1) ?? dayList[0];
       if (first) {
         setSelectedDay(first.dayNumber);
-        setDraft({ title: first.title, message: first.message, imageUrl: first.imageUrl, riddlePrompt: first.riddlePrompt });
+        setDraft({
+          title: first.title,
+          message: first.message,
+          imageUrl: first.imageUrl,
+          riddlePrompt: first.riddlePrompt,
+          sourceStockId: first.sourceStockId,
+        });
       }
     })();
   }, [slug]);
@@ -45,9 +57,16 @@ export function EditorPage() {
         message: day.message,
         imageUrl: day.imageUrl,
         riddlePrompt: day.riddlePrompt,
+        sourceStockId: day.sourceStockId,
       });
     }
   }, [selectedDay, days]);
+
+  const usedStockIds = useMemo(() => collectUsedStockIds(days), [days]);
+  const rankedSuggestions = useMemo(
+    () => rankSuggestions(STOCK_ADVENTURES, selectedDay, usedStockIds),
+    [selectedDay, usedStockIds],
+  );
 
   if (!slug || !calendar) {
     return <div className="page loading">Loading editor…</div>;
@@ -62,22 +81,38 @@ export function EditorPage() {
     if (!user) return;
     setSaving(true);
     setMessage('');
-    await saveDay(slug, user.uid, selectedDay, draft);
-    const refreshed = await getDays(slug);
-    setDays(refreshed);
-    setSaving(false);
-    setMessage('Saved!');
+    setSaveFailed(false);
+    try {
+      await saveDay(slug, user.uid, selectedDay, draft);
+      const refreshed = await getDays(slug);
+      setDays(refreshed);
+      setMessage('Saved!');
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'Unknown error';
+      setSaveFailed(true);
+      setMessage(`Could not save day: ${detail}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleApplyStock = (item: StockAdventure) => {
     const applied = applyStockAdventure(item);
     setDraft((d) => ({ ...d, ...applied }));
+    setShowSuggestions(false);
   };
 
   const handleTitleSave = async () => {
     if (!user) return;
-    await updateCalendarTitle(slug, user.uid, calendar.title);
-    setMessage('Calendar title saved.');
+    try {
+      await updateCalendarTitle(slug, user.uid, calendar.title);
+      setSaveFailed(false);
+      setMessage('Calendar title saved.');
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'Unknown error';
+      setSaveFailed(true);
+      setMessage(`Could not save title: ${detail}`);
+    }
   };
 
   return (
@@ -125,6 +160,13 @@ export function EditorPage() {
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            className="btn primary get-suggestions-btn"
+            onClick={() => setShowSuggestions(true)}
+          >
+            Get suggestions
+          </button>
         </div>
 
         <form className="card day-form" onSubmit={handleSave}>
@@ -172,24 +214,19 @@ export function EditorPage() {
           <button type="submit" className="btn primary" disabled={saving}>
             {saving ? 'Saving…' : 'Save day'}
           </button>
-          {message && <p className="success">{message}</p>}
+          {message && <p className={saveFailed ? 'error' : 'success'}>{message}</p>}
         </form>
-
-        <div className="card stock-panel">
-          <h2>Stock adventures</h2>
-          <p className="muted">Tap to apply inspiration to Day {selectedDay}.</p>
-          <ul className="stock-list">
-            {stock.map((item) => (
-              <li key={item.id}>
-                <button type="button" className="stock-item" onClick={() => handleApplyStock(item)}>
-                  <strong>{item.title}</strong>
-                  <span>{item.description}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
+
+      {showSuggestions && (
+        <SuggestionsModal
+          dayNumber={selectedDay}
+          suggestions={rankedSuggestions}
+          usedIds={usedStockIds}
+          onSelect={handleApplyStock}
+          onClose={() => setShowSuggestions(false)}
+        />
+      )}
     </div>
   );
 }

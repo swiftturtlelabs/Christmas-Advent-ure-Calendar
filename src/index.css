@@ -439,8 +439,13 @@ textarea:focus {
 
 .editor-grid {
   display: grid;
-  grid-template-columns: 220px 1fr 280px;
+  grid-template-columns: 220px 1fr;
   gap: 1.25rem;
+}
+
+.get-suggestions-btn {
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .day-picker-grid,
@@ -453,13 +458,13 @@ textarea:focus {
 .day-pick {
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
-  border: 2px solid #d7e5dc;
-  background: white;
+  border: 2px solid var(--holly-500);
+  background: #fde8e8;
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
-  color: var(--ink-900);
-  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+  color: var(--holly-700);
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .day-pick:hover {
@@ -467,17 +472,21 @@ textarea:focus {
 }
 
 .day-pick.active {
-  border-color: var(--holly-500);
-  background: #ffe9e3;
-  box-shadow: 0 4px 12px rgba(214, 59, 59, 0.25);
+  border-color: var(--holly-700);
+  background: #f8c4c4;
+  box-shadow: 0 4px 12px rgba(214, 59, 59, 0.3);
 }
 
 .day-pick.filled {
+  border-color: #d7e5dc;
   background: #e7f6ee;
+  color: var(--ink-900);
 }
 
 .day-pick.active.filled {
+  border-color: var(--holly-500);
   background: linear-gradient(135deg, #ffe9e3, #e7f6ee);
+  color: var(--ink-900);
 }
 
 .stock-list {
@@ -526,6 +535,70 @@ textarea:focus {
   display: block;
   color: var(--ink-600);
   font-size: 0.9rem;
+}
+
+.stock-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.stock-item-top span {
+  display: inline;
+}
+
+.stock-item.used {
+  opacity: 0.62;
+  background: #f4f7f5;
+}
+
+.stock-item.used:hover {
+  opacity: 0.85;
+}
+
+.stock-used-badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-600);
+  background: #e4ebe6;
+  border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+}
+
+.suggestions-modal {
+  width: min(560px, 100%);
+  max-width: 560px;
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestions-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.suggestions-modal-header h2 {
+  margin: 0 0 0.25rem;
+}
+
+.suggestions-modal-header .muted {
+  margin: 0;
+}
+
+.suggestions-list {
+  max-height: none;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .inline-field {

@@ -38,7 +38,13 @@ export interface StockAdventure {
   title: string;
   description: string;
   category: string;
+  /** General topic tags (indoor, food, etc.). Not shown in the suggestions UI. */
   tags: string[];
+  /**
+   * Hidden day-affinity tags used only for ranking suggestions.
+   * Prefer concrete day numbers ("1"…"24") and/or phases: early | mid | late | eve.
+   */
+  dayTags: string[];
 }
 
 export interface DayDraft {
@@ -47,4 +53,5 @@ export interface DayDraft {
   imageUrl?: string;
   riddlePrompt?: string;
   answer?: string;
+  sourceStockId?: string;
 }
