@@ -42,6 +42,7 @@ export function EditorPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [saveFailed, setSaveFailed] = useState(false);
+  const [savePopup, setSavePopup] = useState<{ text: string; nextDay: number | null } | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [showMoreFields, setShowMoreFields] = useState(false);
@@ -68,6 +69,18 @@ export function EditorPage() {
     }
     setShowMoreFields(false);
   }, [selectedDay, days]);
+
+  useEffect(() => {
+    if (!savePopup) return;
+    const timer = window.setTimeout(() => {
+      const nextDay = savePopup.nextDay;
+      setSavePopup(null);
+      if (nextDay != null) {
+        setSelectedDay(nextDay);
+      }
+    }, 1500);
+    return () => window.clearTimeout(timer);
+  }, [savePopup]);
 
   const usedStockIds = useMemo(() => collectUsedStockIds(days), [days]);
   const rankedSuggestions = useMemo(
@@ -102,7 +115,7 @@ export function EditorPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || savePopup) return;
     setSaving(true);
     setMessage('');
     setSaveFailed(false);
@@ -112,13 +125,12 @@ export function EditorPage() {
       setDays(refreshed);
       const nextUnset =
         refreshed.find((d) => d.dayNumber > selectedDay && !isDaySetup(d)) ??
-        refreshed.find((d) => !isDaySetup(d));
-      if (nextUnset && nextUnset.dayNumber !== selectedDay) {
-        setSelectedDay(nextUnset.dayNumber);
-        setMessage(`Saved! Going to day ${nextUnset.dayNumber}.`);
-      } else {
-        setMessage('Saved!');
-      }
+        refreshed.find((d) => d.dayNumber !== selectedDay && !isDaySetup(d));
+      const nextDay = nextUnset?.dayNumber ?? null;
+      setSavePopup({
+        text: nextDay != null ? `Saved! Going to day ${nextDay}.` : 'Saved!',
+        nextDay,
+      });
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'Unknown error';
       setSaveFailed(true);
@@ -296,12 +308,21 @@ export function EditorPage() {
               </div>
             )}
           </div>
-          <button type="submit" className="btn primary" disabled={saving}>
+          <button type="submit" className="btn primary" disabled={saving || Boolean(savePopup)}>
             {saving ? 'Saving…' : 'Save day'}
           </button>
           {message && <p className={saveFailed ? 'error' : 'success'}>{message}</p>}
         </form>
       </div>
+
+      {savePopup && (
+        <div className="modal-backdrop" role="status" aria-live="polite" aria-busy="true">
+          <div className="modal card save-popup">
+            <p className="save-popup-text">{savePopup.text}</p>
+            <div className="save-popup-spinner" aria-hidden="true" />
+          </div>
+        </div>
+      )}
 
       {showSuggestions && (
         <SuggestionsModal
