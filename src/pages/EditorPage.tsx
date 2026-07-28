@@ -28,8 +28,30 @@ function draftFromDay(day: DayContent): DayDraft {
   };
 }
 
-function isDaySetup(day: { message?: string }): boolean {
-  return Boolean(day.message?.trim());
+function isDaySetup(day: { title?: string; message?: string }): boolean {
+  return Boolean(day.title?.trim() && day.message?.trim());
+}
+
+function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
+  if (!saved) {
+    return Boolean(
+      draft.title.trim() ||
+        draft.message.trim() ||
+        draft.imageUrl?.trim() ||
+        draft.riddlePrompt?.trim() ||
+        draft.answer?.trim() ||
+        draft.sourceStockId,
+    );
+  }
+
+  return (
+    draft.title !== saved.title ||
+    draft.message !== saved.message ||
+    (draft.imageUrl ?? '').trim() !== (saved.imageUrl ?? '').trim() ||
+    (draft.riddlePrompt ?? '').trim() !== (saved.riddlePrompt ?? '').trim() ||
+    (draft.sourceStockId ?? '') !== (saved.sourceStockId ?? '') ||
+    Boolean(draft.answer?.trim())
+  );
 }
 
 export function EditorPage() {
@@ -83,14 +105,29 @@ export function EditorPage() {
     return () => window.clearTimeout(timer);
   }, [savePopup]);
 
+  const savedDay = useMemo(
+    () => days.find((d) => d.dayNumber === selectedDay),
+    [days, selectedDay],
+  );
+  const isDirty = useMemo(() => isDraftDirty(draft, savedDay), [draft, savedDay]);
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [isDirty]);
+
   const usedStockIds = useMemo(() => collectUsedStockIds(days), [days]);
   const rankedSuggestions = useMemo(
     () => rankSuggestions(STOCK_ADVENTURES, selectedDay, usedStockIds),
     [selectedDay, usedStockIds],
   );
-  const selectedIsSetup = isDaySetup(
-    days.find((d) => d.dayNumber === selectedDay) ?? { message: '' },
-  );
+  const selectedIsSetup = isDaySetup(savedDay ?? { title: '', message: '' });
+  const canSave = Boolean(draft.title.trim() && draft.message.trim());
 
   if (!slug || !calendar) {
     return <div className="page loading">Loading editor…</div>;
@@ -100,10 +137,18 @@ export function EditorPage() {
     return <div className="page">You do not have access to edit this calendar.</div>;
   }
 
-  const selectDay = (dayNumber: number) => {
+  const confirmLeaveDay = () => {
+    if (!isDirty) return true;
+    return window.confirm('You have unsaved changes on this day. Leave without saving?');
+  };
+
+  const selectDay = (dayNumber: number): boolean => {
+    if (dayNumber === selectedDay) return true;
+    if (!confirmLeaveDay()) return false;
     setSelectedDay(dayNumber);
     setMessage('');
     setSaveFailed(false);
+    return true;
   };
 
   const goToAdjacentDay = (delta: number) => {
@@ -114,14 +159,33 @@ export function EditorPage() {
     if (next) selectDay(next.dayNumber);
   };
 
+  const handleNavAway = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!confirmLeaveDay()) {
+      event.preventDefault();
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || savePopup) return;
+
+    const title = draft.title.trim();
+    const adventureMessage = draft.message.trim();
+    if (!title || !adventureMessage) {
+      setSaveFailed(true);
+      setMessage('Title and adventure message are required.');
+      return;
+    }
+
     setSaving(true);
     setMessage('');
     setSaveFailed(false);
     try {
-      await saveDay(slug, user.uid, selectedDay, draft);
+      await saveDay(slug, user.uid, selectedDay, {
+        ...draft,
+        title,
+        message: adventureMessage,
+      });
       const refreshed = await getDays(slug);
       setDays(refreshed);
       const nextUnset =
@@ -164,10 +228,12 @@ export function EditorPage() {
   return (
     <div className="page editor">
       <div className="editor-header">
-        <Link to="/app">← Back</Link>
+        <Link to="/app" onClick={handleNavAway}>
+          ← Back
+        </Link>
         <h1>Edit calendar</h1>
         <div className="editor-header-actions">
-          <Link className="btn secondary" to={`/app/c/${slug}/qr`}>
+          <Link className="btn secondary" to={`/app/c/${slug}/qr`} onClick={handleNavAway}>
             QR codes
           </Link>
           <Link className="btn secondary" to={`/c/${slug}`} target="_blank">
@@ -262,7 +328,11 @@ export function EditorPage() {
 
           <label>
             Title
-            <input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} required />
+            <input
+              value={draft.title}
+              onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+              required
+            />
           </label>
           <label>
             Adventure message
@@ -271,6 +341,7 @@ export function EditorPage() {
               onChange={(e) => setDraft({ ...draft, message: e.target.value })}
               rows={5}
               placeholder="Describe today's Christmas adventure…"
+              required
             />
           </label>
           <div className="more-fields">
@@ -319,7 +390,11 @@ export function EditorPage() {
               </div>
             )}
           </div>
-          <button type="submit" className="btn primary" disabled={saving || Boolean(savePopup)}>
+          <button
+            type="submit"
+            className="btn primary"
+            disabled={saving || Boolean(savePopup) || !canSave}
+          >
             {saving ? 'Saving…' : 'Save day'}
           </button>
           {message && <p className={saveFailed ? 'error' : 'success'}>{message}</p>}
@@ -363,8 +438,9 @@ export function EditorPage() {
                   type="button"
                   className={`day-pick ${selectedDay === day.dayNumber ? 'active' : ''} ${isDaySetup(day) ? 'filled' : ''}`}
                   onClick={() => {
-                    selectDay(day.dayNumber);
-                    setShowDayPickerModal(false);
+                    if (selectDay(day.dayNumber)) {
+                      setShowDayPickerModal(false);
+                    }
                   }}
                 >
                   {day.dayNumber}
