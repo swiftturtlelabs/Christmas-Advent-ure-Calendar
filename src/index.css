@@ -956,9 +956,8 @@ textarea:focus {
 }
 
 .save-popup-forward {
-  display: grid;
-  gap: 0.9rem;
-  justify-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 .save-popup-chevrons {
@@ -985,23 +984,6 @@ textarea:focus {
   animation-delay: 0.3s;
 }
 
-.save-popup-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: #e4ebe6;
-  overflow: hidden;
-}
-
-.save-popup-progress {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--gold-400), var(--holly-500));
-  transform-origin: left center;
-  animation: save-progress-fill 1.5s linear forwards;
-}
-
 @keyframes save-chevron-march {
   0%,
   100% {
@@ -1011,15 +993,6 @@ textarea:focus {
   50% {
     opacity: 1;
     transform: translateX(4px);
-  }
-}
-
-@keyframes save-progress-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
   }
 }
 

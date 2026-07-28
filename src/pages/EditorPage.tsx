@@ -336,9 +336,6 @@ export function EditorPage() {
                 <ChevronRight className="save-popup-chevron" size={28} strokeWidth={2.6} />
                 <ChevronRight className="save-popup-chevron" size={28} strokeWidth={2.6} />
               </span>
-              <div className="save-popup-track">
-                <div className="save-popup-progress" />
-              </div>
             </div>
           </div>
         </div>
