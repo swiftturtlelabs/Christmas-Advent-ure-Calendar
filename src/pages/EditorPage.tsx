@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   getCalendar,
@@ -17,6 +17,10 @@ import { InfoTooltip } from '../components/InfoTooltip';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
+
+type LeaveAction =
+  | { type: 'day'; dayNumber: number }
+  | { type: 'navigate'; to: string; actionLabel: string };
 
 function draftFromDay(day: DayContent): DayDraft {
   return {
@@ -54,8 +58,13 @@ function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
   );
 }
 
+function leaveActionLabel(action: LeaveAction): string {
+  return action.type === 'day' ? `go to day ${action.dayNumber}` : action.actionLabel;
+}
+
 export function EditorPage() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [days, setDays] = useState<DayContent[]>([]);
@@ -65,6 +74,7 @@ export function EditorPage() {
   const [message, setMessage] = useState('');
   const [saveFailed, setSaveFailed] = useState(false);
   const [savePopup, setSavePopup] = useState<{ text: string; nextDay: number | null } | null>(null);
+  const [leavePrompt, setLeavePrompt] = useState<LeaveAction | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showDayPickerModal, setShowDayPickerModal] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -137,18 +147,32 @@ export function EditorPage() {
     return <div className="page">You do not have access to edit this calendar.</div>;
   }
 
-  const confirmLeaveDay = () => {
-    if (!isDirty) return true;
-    return window.confirm('You have unsaved changes on this day. Leave without saving?');
+  const performLeave = (action: LeaveAction) => {
+    setLeavePrompt(null);
+    if (action.type === 'day') {
+      setSelectedDay(action.dayNumber);
+      setMessage('');
+      setSaveFailed(false);
+      setShowDayPickerModal(false);
+      return;
+    }
+    navigate(action.to);
   };
 
-  const selectDay = (dayNumber: number): boolean => {
-    if (dayNumber === selectedDay) return true;
-    if (!confirmLeaveDay()) return false;
-    setSelectedDay(dayNumber);
-    setMessage('');
-    setSaveFailed(false);
-    return true;
+  const requestLeave = (action: LeaveAction) => {
+    if (!isDirty) {
+      performLeave(action);
+      return;
+    }
+    setLeavePrompt(action);
+  };
+
+  const selectDay = (dayNumber: number) => {
+    if (dayNumber === selectedDay) {
+      setShowDayPickerModal(false);
+      return;
+    }
+    requestLeave({ type: 'day', dayNumber });
   };
 
   const goToAdjacentDay = (delta: number) => {
@@ -159,22 +183,26 @@ export function EditorPage() {
     if (next) selectDay(next.dayNumber);
   };
 
-  const handleNavAway = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!confirmLeaveDay()) {
-      event.preventDefault();
-    }
+  const handleNavAway = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    to: string,
+    actionLabel: string,
+  ) => {
+    if (!isDirty) return;
+    event.preventDefault();
+    setLeavePrompt({ type: 'navigate', to, actionLabel });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || savePopup) return;
+  const persistCurrentDay = async (): Promise<DayContent[] | null> => {
+    if (!user) return null;
 
     const title = draft.title.trim();
     const adventureMessage = draft.message.trim();
     if (!title || !adventureMessage) {
       setSaveFailed(true);
       setMessage('Title and adventure message are required.');
-      return;
+      setLeavePrompt(null);
+      return null;
     }
 
     setSaving(true);
@@ -188,21 +216,41 @@ export function EditorPage() {
       });
       const refreshed = await getDays(slug);
       setDays(refreshed);
-      const nextUnset =
-        refreshed.find((d) => d.dayNumber > selectedDay && !isDaySetup(d)) ??
-        refreshed.find((d) => d.dayNumber !== selectedDay && !isDaySetup(d));
-      const nextDay = nextUnset?.dayNumber ?? null;
-      setSavePopup({
-        text: nextDay != null ? `Saved! Going to day ${nextDay}.` : 'Saved!',
-        nextDay,
-      });
+      return refreshed;
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'Unknown error';
       setSaveFailed(true);
       setMessage(`Could not save day: ${detail}`);
+      setLeavePrompt(null);
+      return null;
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || savePopup || leavePrompt) return;
+
+    const refreshed = await persistCurrentDay();
+    if (!refreshed) return;
+
+    const nextUnset =
+      refreshed.find((d) => d.dayNumber > selectedDay && !isDaySetup(d)) ??
+      refreshed.find((d) => d.dayNumber !== selectedDay && !isDaySetup(d));
+    const nextDay = nextUnset?.dayNumber ?? null;
+    setSavePopup({
+      text: nextDay != null ? `Saved! Going to day ${nextDay}.` : 'Saved!',
+      nextDay,
+    });
+  };
+
+  const handleSaveAndLeave = async () => {
+    if (!leavePrompt) return;
+    const action = leavePrompt;
+    const refreshed = await persistCurrentDay();
+    if (!refreshed) return;
+    performLeave(action);
   };
 
   const handleApplyStock = (item: StockAdventure) => {
@@ -228,12 +276,16 @@ export function EditorPage() {
   return (
     <div className="page editor">
       <div className="editor-header">
-        <Link to="/app" onClick={handleNavAway}>
+        <Link to="/app" onClick={(e) => handleNavAway(e, '/app', 'go back')}>
           ← Back
         </Link>
         <h1>Edit calendar</h1>
         <div className="editor-header-actions">
-          <Link className="btn secondary" to={`/app/c/${slug}/qr`} onClick={handleNavAway}>
+          <Link
+            className="btn secondary"
+            to={`/app/c/${slug}/qr`}
+            onClick={(e) => handleNavAway(e, `/app/c/${slug}/qr`, 'open QR codes')}
+          >
             QR codes
           </Link>
           <Link className="btn secondary" to={`/c/${slug}`} target="_blank">
@@ -437,16 +489,60 @@ export function EditorPage() {
                   key={day.dayNumber}
                   type="button"
                   className={`day-pick ${selectedDay === day.dayNumber ? 'active' : ''} ${isDaySetup(day) ? 'filled' : ''}`}
-                  onClick={() => {
-                    if (selectDay(day.dayNumber)) {
-                      setShowDayPickerModal(false);
-                    }
-                  }}
+                  onClick={() => selectDay(day.dayNumber)}
                 >
                   {day.dayNumber}
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {leavePrompt && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="leave-prompt-title"
+        >
+          <div className="modal card leave-prompt">
+            <h2 id="leave-prompt-title">Unsaved changes</h2>
+            <p className="muted">
+              You have unsaved changes on this day. What would you like to do before you{' '}
+              {leaveActionLabel(leavePrompt)}?
+            </p>
+            <div className="leave-prompt-actions">
+              <button
+                type="button"
+                className="btn primary"
+                disabled={saving || !canSave}
+                onClick={handleSaveAndLeave}
+              >
+                {saving ? 'Saving…' : `Save and ${leaveActionLabel(leavePrompt)}`}
+              </button>
+              <button
+                type="button"
+                className="btn secondary"
+                disabled={saving}
+                onClick={() => performLeave(leavePrompt)}
+              >
+                Leave without saving
+              </button>
+              <button
+                type="button"
+                className="btn secondary"
+                disabled={saving}
+                onClick={() => setLeavePrompt(null)}
+              >
+                Stay
+              </button>
+            </div>
+            {!canSave && (
+              <p className="error leave-prompt-hint">
+                Add a title and adventure message to use Save and {leaveActionLabel(leavePrompt)}.
+              </p>
+            )}
           </div>
         </div>
       )}
