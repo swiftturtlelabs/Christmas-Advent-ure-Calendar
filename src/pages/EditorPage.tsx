@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   getCalendar,
   getDays,
@@ -44,6 +44,7 @@ export function EditorPage() {
   const [saveFailed, setSaveFailed] = useState(false);
   const [savePopup, setSavePopup] = useState<{ text: string; nextDay: number | null } | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showDayPickerModal, setShowDayPickerModal] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [showMoreFields, setShowMoreFields] = useState(false);
 
@@ -219,25 +220,35 @@ export function EditorPage() {
 
         <form className="card day-form" onSubmit={handleSave}>
           <div className="day-form-header">
-            <div className="day-stepper">
+            <div className="day-nav-row">
+              <div className="day-stepper">
+                <button
+                  type="button"
+                  className="day-stepper-btn"
+                  aria-label="Previous day"
+                  onClick={() => goToAdjacentDay(-1)}
+                >
+                  <ChevronLeft size={22} strokeWidth={2.4} />
+                </button>
+                <h2 className={`day-form-heading ${selectedIsSetup ? 'filled' : 'unset'}`}>
+                  Day {selectedDay}
+                </h2>
+                <button
+                  type="button"
+                  className="day-stepper-btn"
+                  aria-label="Next day"
+                  onClick={() => goToAdjacentDay(1)}
+                >
+                  <ChevronRight size={22} strokeWidth={2.4} />
+                </button>
+              </div>
               <button
                 type="button"
-                className="day-stepper-btn"
-                aria-label="Previous day"
-                onClick={() => goToAdjacentDay(-1)}
+                className="day-calendar-btn"
+                aria-label="Open day picker"
+                onClick={() => setShowDayPickerModal(true)}
               >
-                <ChevronLeft size={22} strokeWidth={2.4} />
-              </button>
-              <h2 className={`day-form-heading ${selectedIsSetup ? 'filled' : 'unset'}`}>
-                Day {selectedDay}
-              </h2>
-              <button
-                type="button"
-                className="day-stepper-btn"
-                aria-label="Next day"
-                onClick={() => goToAdjacentDay(1)}
-              >
-                <ChevronRight size={22} strokeWidth={2.4} />
+                <CalendarDays size={22} strokeWidth={2.2} />
               </button>
             </div>
             <button
@@ -319,7 +330,50 @@ export function EditorPage() {
         <div className="modal-backdrop" role="status" aria-live="polite" aria-busy="true">
           <div className="modal card save-popup">
             <p className="save-popup-text">{savePopup.text}</p>
-            <div className="save-popup-spinner" aria-hidden="true" />
+            <div className="save-popup-forward" aria-hidden="true">
+              <span className="save-popup-chevrons">
+                <ChevronRight className="save-popup-chevron" size={28} strokeWidth={2.6} />
+                <ChevronRight className="save-popup-chevron" size={28} strokeWidth={2.6} />
+                <ChevronRight className="save-popup-chevron" size={28} strokeWidth={2.6} />
+              </span>
+              <div className="save-popup-track">
+                <div className="save-popup-progress" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDayPickerModal && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="day-picker-modal-title"
+          onClick={() => setShowDayPickerModal(false)}
+        >
+          <div className="modal card day-picker-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="day-picker-modal-header">
+              <h2 id="day-picker-modal-title">Days</h2>
+              <button type="button" className="btn secondary" onClick={() => setShowDayPickerModal(false)}>
+                Close
+              </button>
+            </div>
+            <div className="day-picker-grid">
+              {days.map((day) => (
+                <button
+                  key={day.dayNumber}
+                  type="button"
+                  className={`day-pick ${selectedDay === day.dayNumber ? 'active' : ''} ${isDaySetup(day) ? 'filled' : ''}`}
+                  onClick={() => {
+                    selectDay(day.dayNumber);
+                    setShowDayPickerModal(false);
+                  }}
+                >
+                  {day.dayNumber}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
