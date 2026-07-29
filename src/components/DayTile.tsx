@@ -36,7 +36,7 @@ export function DayTile({ day, previewDate, year, onOpen, onLockedClick }: DayTi
       onClick={handleClick}
       aria-label={`Day ${day.dayNumber}${showLock ? ', locked — solve the riddle to unlock early' : showOverlay ? ', upcoming' : ''}`}
     >
-      <span className="day-tile-media">
+      <span className="day-tile-image-wrap">
         <img
           className="day-tile-image"
           src={getLegacyDayImageUrl(day.dayNumber)}
