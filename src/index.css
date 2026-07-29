@@ -436,18 +436,20 @@ main {
 
 .phone-frame__screen .public-calendar .public-header {
   margin: 2.1rem -0.4rem 0.55rem;
-  padding: 0.65rem 0.85rem;
+  padding: 0.8rem 0.9rem;
   background: rgba(245, 192, 76, 0.42);
 }
 
 .phone-frame__screen .public-calendar .public-header h1 {
-  color: var(--holly-600);
-  font-size: clamp(1.1rem, 7cqi, 1.6rem);
+  color: var(--holly-500);
+  font-size: clamp(1.45rem, 9cqi, 1.95rem);
+  font-weight: 700;
   margin: 0;
 }
 
 .phone-frame__screen .public-calendar .public-header-year {
-  font-size: clamp(1rem, 5.5cqi, 1.25rem);
+  font-size: clamp(1.25rem, 7cqi, 1.55rem);
+  font-weight: 700;
 }
 
 .phone-frame__screen .public-calendar .public-footer {
@@ -1092,14 +1094,14 @@ textarea:focus {
 
 .public-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
   margin: 0.55rem -1rem 0.85rem;
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1.1rem;
   background: rgba(245, 192, 76, 0.42);
 }
 
@@ -1118,28 +1120,34 @@ textarea:focus {
 }
 
 .public-header h1 {
-  color: var(--holly-600);
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  color: var(--holly-500);
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
   margin: 0;
   text-align: left;
   flex: 1;
   min-width: 0;
   text-shadow:
-    0 1px 0 rgba(255, 253, 248, 0.35),
-    0 2px 10px rgba(0, 0, 0, 0.28);
+    0 1px 0 rgba(255, 253, 248, 0.55),
+    0 2px 2px rgba(6, 37, 28, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .public-header-year {
   margin: 0;
   flex-shrink: 0;
-  color: var(--holly-600);
+  color: var(--holly-500);
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 3.5vw, 2rem);
+  font-size: clamp(1.55rem, 4vw, 2.25rem);
   font-weight: 700;
+  letter-spacing: 0.03em;
   line-height: 1;
   text-shadow:
-    0 1px 0 rgba(255, 253, 248, 0.35),
-    0 2px 10px rgba(0, 0, 0, 0.28);
+    0 1px 0 rgba(255, 253, 248, 0.55),
+    0 2px 2px rgba(6, 37, 28, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .public-footer {
@@ -1667,18 +1675,20 @@ textarea:focus {
 
   .public-calendar .public-header {
     margin: 0.85rem -0.4rem 0.55rem;
-    padding: 0.65rem 0.85rem;
+    padding: 0.8rem 0.9rem;
     background: rgba(245, 192, 76, 0.42);
   }
 
   .public-calendar .public-header h1 {
-    color: var(--holly-600);
-    font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+    color: var(--holly-500);
+    font-size: clamp(1.45rem, 7vw, 1.95rem);
+    font-weight: 700;
     margin: 0;
   }
 
   .public-calendar .public-header-year {
-    font-size: clamp(1rem, 4.5vw, 1.25rem);
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
+    font-weight: 700;
   }
 
   .public-calendar .public-footer {
