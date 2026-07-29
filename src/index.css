@@ -459,6 +459,8 @@ main {
   column-gap: 1.25rem;
   row-gap: 0.55rem;
   padding-inline: 1rem;
+  /* Pull top row down / bottom row up; footer stays pinned below */
+  padding-block: clamp(1.5rem, 5.5%, 2.75rem);
   max-width: none;
   width: 100%;
 }
@@ -1660,6 +1662,7 @@ textarea:focus {
     column-gap: 1.25rem;
     row-gap: 0.55rem;
     padding-inline: 1rem;
+    padding-block: clamp(1.5rem, 5.5vh, 2.75rem);
     max-width: none;
     width: 100%;
   }
