@@ -17,6 +17,7 @@ import { InfoTooltip } from '../components/InfoTooltip';
 import { PreviewDateModal } from '../components/PreviewDateModal';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { isDaySetup } from '../lib/calendarProgress';
+import { CALENDAR_TITLE_LONG_WARNING, isCalendarTitleLong } from '../lib/calendarTitle';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
 
@@ -307,6 +308,11 @@ export function EditorPage() {
                 Save
               </button>
             </div>
+            {isCalendarTitleLong(calendar.title) && (
+              <p className="field-warning" role="status">
+                {CALENDAR_TITLE_LONG_WARNING}
+              </p>
+            )}
           </label>
         ) : (
           <div className="inline-field calendar-title-display">
@@ -315,6 +321,11 @@ export function EditorPage() {
               Edit Title
             </button>
           </div>
+        )}
+        {!editingTitle && isCalendarTitleLong(calendar.title) && (
+          <p className="field-warning" role="status">
+            {CALENDAR_TITLE_LONG_WARNING}
+          </p>
         )}
       </div>
 

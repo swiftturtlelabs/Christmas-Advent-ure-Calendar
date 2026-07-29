@@ -8,6 +8,7 @@ import {
   getSetupStatus,
   getSetupStatusLabel,
 } from '../lib/calendarProgress';
+import { CALENDAR_TITLE_LONG_WARNING, isCalendarTitleLong } from '../lib/calendarTitle';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar } from '../lib/types';
 
@@ -92,6 +93,11 @@ export function DashboardPage() {
           <label>
             Title
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Smith Family 2026" required />
+            {isCalendarTitleLong(title) && (
+              <p className="field-warning" role="status">
+                {CALENDAR_TITLE_LONG_WARNING}
+              </p>
+            )}
           </label>
           <label>
             Year

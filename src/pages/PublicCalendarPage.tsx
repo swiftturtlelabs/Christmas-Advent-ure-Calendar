@@ -6,6 +6,7 @@ import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
 import { getCalendar, getDays } from '../lib/calendarService';
+import { publicCalendarTitleFontSize } from '../lib/calendarTitle';
 import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
@@ -50,7 +51,7 @@ export function PublicCalendarPage() {
     <div className="page public-calendar">
       <Snowfall />
       <header className="public-header">
-        <h1>{calendar.title}</h1>
+        <h1 style={{ fontSize: publicCalendarTitleFontSize(calendar.title) }}>{calendar.title}</h1>
         <p className="public-header-year">{calendar.year}</p>
       </header>
       <div className="public-day-grid">
