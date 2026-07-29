@@ -946,9 +946,10 @@ textarea:focus {
   display: grid;
   grid-template-columns: repeat(4, minmax(72px, 1fr));
   grid-template-rows: repeat(6, auto);
-  gap: 5rem;
+  gap: 3rem;
   max-width: 720px;
   margin: 0 auto;
+  padding-inline: 2rem;
   position: relative;
   z-index: 1;
 }
@@ -982,10 +983,15 @@ textarea:focus {
 
 .day-tile-image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: inherit;
   display: block;
 }
 
@@ -1405,7 +1411,8 @@ textarea:focus {
   .public-calendar .public-day-grid {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    gap: 2.2rem;
+    gap: 1.25rem;
+    padding-inline: 1rem;
     max-width: none;
     width: 100%;
   }
