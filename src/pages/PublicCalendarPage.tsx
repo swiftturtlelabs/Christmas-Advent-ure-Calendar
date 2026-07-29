@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DayTile } from '../components/DayTile';
+import { PhoneFrame } from '../components/PhoneFrame';
 import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
@@ -8,6 +9,10 @@ import { getCalendar, getDays } from '../lib/calendarService';
 import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
+
+function framed(children: ReactNode) {
+  return <PhoneFrame>{children}</PhoneFrame>;
+}
 
 export function PublicCalendarPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -34,14 +39,14 @@ export function PublicCalendarPage() {
   };
 
   if (loading) {
-    return <div className="page loading public">Loading calendar…</div>;
+    return framed(<div className="page loading public">Loading calendar…</div>);
   }
 
   if (!calendar) {
-    return <div className="page public">Calendar not found.</div>;
+    return framed(<div className="page public">Calendar not found.</div>);
   }
 
-  return (
+  return framed(
     <div className="page public-calendar">
       <Snowfall />
       <header className="public-header">
@@ -78,6 +83,6 @@ export function PublicCalendarPage() {
           }}
         />
       )}
-    </div>
+    </div>,
   );
 }

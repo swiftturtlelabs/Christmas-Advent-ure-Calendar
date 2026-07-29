@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 
 interface Flake {
   x: number;
@@ -17,6 +16,8 @@ export function Snowfall() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const parent = canvas.parentElement;
+    if (!parent) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -24,13 +25,14 @@ export function Snowfall() {
     const flakes: Flake[] = [];
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const { clientWidth, clientHeight } = parent;
+      canvas.width = clientWidth;
+      canvas.height = clientHeight;
     };
 
     const initFlakes = () => {
       flakes.length = 0;
-      const count = Math.min(120, Math.floor(window.innerWidth / 8));
+      const count = Math.min(120, Math.floor(Math.max(parent.clientWidth, 1) / 8));
       for (let i = 0; i < count; i += 1) {
         flakes.push({
           x: Math.random() * canvas.width,
@@ -69,21 +71,25 @@ export function Snowfall() {
       animationId = requestAnimationFrame(draw);
     };
 
+    const onResize = () => {
+      resize();
+      initFlakes();
+    };
+
     resize();
     initFlakes();
     draw();
-    window.addEventListener('resize', () => {
-      resize();
-      initFlakes();
-    });
+
+    const observer = new ResizeObserver(onResize);
+    observer.observe(parent);
+    window.addEventListener('resize', onResize);
 
     return () => {
       cancelAnimationFrame(animationId);
+      observer.disconnect();
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
-  return createPortal(
-    <canvas ref={canvasRef} className="snowfall" aria-hidden="true" />,
-    document.body,
-  );
+  return <canvas ref={canvasRef} className="snowfall" aria-hidden="true" />;
 }

@@ -323,13 +323,208 @@ main {
 }
 
 .snowfall {
-  position: fixed;
+  position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Phone emulator for public calendar / day pages (desktop & tablet) */
+.phone-stage {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(245, 192, 76, 0.12), transparent 42%),
+    radial-gradient(circle at 80% 80%, rgba(214, 59, 59, 0.1), transparent 40%),
+    linear-gradient(165deg, #041a14 0%, var(--pine-950) 55%, #0a2f24 100%);
+}
+
+.phone-frame {
+  width: min(390px, 100%, calc((100dvh - 3rem) * 390 / 844));
+  aspect-ratio: 390 / 844;
+  flex-shrink: 0;
+}
+
+.phone-frame__bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  border-radius: 44px;
+  background: linear-gradient(145deg, #2a2a2e 0%, #0c0c0e 40%, #1a1a1e 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 0 3px #0a0a0c,
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+}
+
+.phone-frame__island {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 28px;
+  border-radius: 20px;
+  background: #050505;
+  z-index: 5;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.phone-frame__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 34px;
+  overflow: hidden;
+  container-type: inline-size;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(245, 192, 76, 0.16), transparent 40%),
+    radial-gradient(circle at 88% 18%, rgba(214, 59, 59, 0.14), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(47, 143, 97, 0.25), transparent 55%),
+    linear-gradient(160deg, var(--pine-950) 0%, var(--pine-900) 45%, var(--pine-700) 100%);
+  isolation: isolate;
+}
+
+.phone-frame__home {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 108px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.phone-frame__screen > .page {
+  min-height: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.phone-frame__screen .page.loading,
+.phone-frame__screen .page.public {
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+}
+
+.phone-frame__screen .modal-backdrop {
+  position: absolute;
+}
+
+/* Force mobile spacing inside the phone screen (viewport may be wide) */
+.phone-frame__screen .page.public-calendar {
+  height: 100%;
+  min-height: 100%;
+  padding: 0.45rem 0.4rem 0.35rem;
+  overflow: hidden;
+}
+
+.phone-frame__screen .public-calendar .public-header {
+  margin-bottom: 0.3rem;
+  padding-top: 1.5rem;
+}
+
+.phone-frame__screen .public-calendar .public-header h1 {
+  font-size: clamp(1.1rem, 7cqi, 1.6rem);
+  margin-bottom: 0;
+}
+
+.phone-frame__screen .public-calendar .public-footer {
+  margin-top: 0.2rem;
+  padding-bottom: 0.35rem;
+}
+
+.phone-frame__screen .public-calendar .public-footer p {
+  font-size: 0.62rem;
+}
+
+.phone-frame__screen .public-calendar .public-day-grid {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  column-gap: 1.25rem;
+  row-gap: 0.55rem;
+  padding-inline: 1rem;
+  max-width: none;
+  width: 100%;
+}
+
+.phone-frame__screen .public-calendar .day-tile {
+  aspect-ratio: unset;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 8px;
+}
+
+.phone-frame__screen .public-calendar .day-tile-icon svg {
+  width: clamp(1rem, 4.5cqi, 1.35rem);
+  height: clamp(1rem, 4.5cqi, 1.35rem);
+}
+
+.phone-frame__screen .page.public-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.75rem 0.85rem 1.25rem;
+  overflow: auto;
+}
+
+.phone-frame__screen .public-day .day-scene {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-frame__screen .public-day .tree-image {
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+  height: 100%;
+}
+
+.phone-frame__screen .public-day .day-card {
+  margin: 0 auto;
+  max-width: none;
+}
+
+.phone-frame__screen .public-day .back-link {
+  margin: 0.85rem 0 0;
+  flex-shrink: 0;
+}
+
+.phone-frame__screen .day-overlay {
+  padding: 1.25rem 1rem;
+}
+
+.phone-frame__screen .day-overlay h1 {
+  font-size: clamp(1.35rem, 7cqi, 1.85rem);
+}
+
+.phone-frame__screen .day-message {
+  font-size: clamp(0.95rem, 4.5cqi, 1.2rem);
+}
+
+.phone-frame__screen .day-custom-image {
+  max-width: min(160px, 45%);
 }
 
 label {
@@ -1397,6 +1592,46 @@ textarea:focus {
 }
 
 @media (max-width: 520px) {
+  /* On real phones, drop the emulator chrome and go full-bleed */
+  .phone-stage {
+    display: block;
+    min-height: 100dvh;
+    padding: 0;
+    background: none;
+  }
+
+  .phone-frame {
+    width: 100%;
+    max-height: none;
+    aspect-ratio: auto;
+    height: 100dvh;
+  }
+
+  .phone-frame__bezel {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .phone-frame__island,
+  .phone-frame__home {
+    display: none;
+  }
+
+  .phone-frame__screen {
+    border-radius: 0;
+    background: none;
+  }
+
+  .phone-frame__screen .public-calendar .public-header {
+    padding-top: 0;
+  }
+
+  .phone-frame__screen .page.public-day {
+    padding: 1rem 0.75rem;
+  }
+
   .page.public-calendar {
     height: 100dvh;
     padding: 0.45rem 0.4rem 0.35rem;

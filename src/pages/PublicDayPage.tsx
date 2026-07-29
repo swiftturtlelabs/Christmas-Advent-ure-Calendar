@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { PhoneFrame } from '../components/PhoneFrame';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
@@ -7,6 +8,10 @@ import { isDayUnlocked } from '../lib/dateLock';
 import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
+
+function framed(children: ReactNode) {
+  return <PhoneFrame>{children}</PhoneFrame>;
+}
 
 export function PublicDayPage() {
   const { token } = useParams<{ token: string }>();
@@ -30,11 +35,11 @@ export function PublicDayPage() {
   }, [token]);
 
   if (loading) {
-    return <div className="page loading public">Loading adventure…</div>;
+    return framed(<div className="page loading public">Loading adventure…</div>);
   }
 
   if (!calendar || !day) {
-    return <div className="page public">Adventure not found.</div>;
+    return framed(<div className="page public">Adventure not found.</div>);
   }
 
   const unlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), calendar.year);
@@ -43,7 +48,7 @@ export function PublicDayPage() {
   const calendarPath = withPreviewDate(`/c/${calendar.slug}`, previewDate);
 
   if (!canView) {
-    return (
+    return framed(
       <div className="page public-day locked-view">
         <Snowfall />
         <div className="card day-card">
@@ -51,11 +56,11 @@ export function PublicDayPage() {
           <p>Not yet! This adventure opens on December {day.dayNumber}.</p>
           <Link to={calendarPath}>← Back to calendar</Link>
         </div>
-      </div>
+      </div>,
     );
   }
 
-  return (
+  return framed(
     <div className="page public-day">
       <Snowfall />
       <div className="day-scene card">
@@ -76,6 +81,6 @@ export function PublicDayPage() {
       <p className="back-link">
         <Link to={calendarPath}>← Back to all days</Link>
       </p>
-    </div>
+    </div>,
   );
 }
