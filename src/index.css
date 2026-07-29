@@ -889,7 +889,7 @@ textarea:focus {
 
 .public-header {
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   position: relative;
   z-index: 1;
 }
@@ -898,7 +898,7 @@ textarea:focus {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 1rem 0.35rem;
+  padding: 0.75rem 1rem 0.45rem;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -906,7 +906,6 @@ textarea:focus {
 .public-calendar .public-day-grid {
   flex: 1;
   min-height: 0;
-  align-content: space-between;
 }
 
 .public-header h1 {
@@ -948,7 +947,7 @@ textarea:focus {
   grid-template-columns: repeat(4, minmax(72px, 1fr));
   grid-template-rows: repeat(6, auto);
   column-gap: 3rem;
-  row-gap: 1.5rem;
+  row-gap: 1.75rem;
   max-width: 720px;
   margin: 0 auto;
   padding-inline: 2rem;
@@ -1400,11 +1399,11 @@ textarea:focus {
 @media (max-width: 520px) {
   .page.public-calendar {
     height: 100dvh;
-    padding: 0.35rem 0.4rem 0.3rem;
+    padding: 0.45rem 0.4rem 0.35rem;
   }
 
   .public-calendar .public-header {
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.3rem;
   }
 
   .public-calendar .public-header h1 {
@@ -1413,7 +1412,7 @@ textarea:focus {
   }
 
   .public-calendar .public-footer {
-    margin-top: 0.15rem;
+    margin-top: 0.2rem;
   }
 
   .public-calendar .public-footer p {
@@ -1422,19 +1421,18 @@ textarea:focus {
 
   .public-calendar .public-day-grid {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(6, auto);
-    align-content: space-between;
+    grid-template-rows: repeat(6, minmax(0, 1fr));
     column-gap: 1.25rem;
-    row-gap: 0.5rem;
+    row-gap: 0.55rem;
     padding-inline: 1rem;
     max-width: none;
     width: 100%;
   }
 
   .public-calendar .day-tile {
-    aspect-ratio: 1;
+    aspect-ratio: unset;
     width: 100%;
-    height: auto;
+    height: 100%;
     min-height: 0;
     border-radius: 8px;
   }
