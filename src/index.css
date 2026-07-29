@@ -888,9 +888,8 @@ textarea:focus {
 }
 
 .public-header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.65rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
   position: relative;
   z-index: 1;
 }
@@ -899,7 +898,7 @@ textarea:focus {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 0.65rem 1rem 0.4rem;
+  padding: 1.25rem 1rem 1rem;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -910,56 +909,16 @@ textarea:focus {
 }
 
 .public-header h1 {
-  margin: 0;
-}
-
-.public-title-ribbon {
-  position: relative;
-  display: inline-block;
-  margin: 0;
-  padding: 0.5rem 2.5rem;
-  background: linear-gradient(180deg, var(--holly-500) 0%, var(--holly-700) 55%, #7a1219 100%);
-  color: var(--snow-50);
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 4.5vw, 2.8rem);
-  font-weight: 700;
-  line-height: 1.15;
-  text-align: center;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  border-top: 2px solid rgba(255, 224, 138, 0.55);
-  border-bottom: 2px solid rgba(80, 10, 16, 0.65);
-}
-
-.public-title-ribbon::before,
-.public-title-ribbon::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1.1rem;
-  background: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.public-title-ribbon::before {
-  left: -0.75rem;
-  clip-path: polygon(100% 0, 100% 100%, 0 50%);
-  filter: brightness(0.88);
-}
-
-.public-title-ribbon::after {
-  right: -0.75rem;
-  clip-path: polygon(0 0, 0 100%, 100% 50%);
-  filter: brightness(0.88);
+  color: var(--gold-400);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin-bottom: 0;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.35);
 }
 
 .public-footer {
   flex-shrink: 0;
   text-align: center;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
   position: relative;
   z-index: 1;
 }
@@ -987,40 +946,26 @@ textarea:focus {
   display: grid;
   grid-template-columns: repeat(4, minmax(72px, 1fr));
   grid-template-rows: repeat(6, auto);
-  column-gap: 3rem;
-  row-gap: 1rem;
+  gap: 3rem;
   max-width: 720px;
   margin: 0 auto;
   padding-inline: 2rem;
-  padding-block: 0.15rem;
   position: relative;
   z-index: 1;
 }
 
 .day-tile {
   aspect-ratio: 1;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   display: block;
   padding: 0;
   font-family: var(--font-display);
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   transition: transform 0.18s ease;
   background: transparent;
-}
-
-.day-tile-media {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  line-height: 0;
 }
 
 .day-tile:hover:not(:disabled) {
@@ -1037,13 +982,17 @@ textarea:focus {
 }
 
 .day-tile-image {
-  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
   border-radius: inherit;
+  display: block;
 }
 
 .day-tile-lock-overlay {
@@ -1052,7 +1001,6 @@ textarea:focus {
   background: rgba(30, 40, 36, 0.55);
   border-radius: inherit;
   z-index: 1;
-  pointer-events: none;
 }
 
 .day-tile-icon {
@@ -1440,32 +1388,15 @@ textarea:focus {
 @media (max-width: 520px) {
   .page.public-calendar {
     height: 100dvh;
-    padding: 0.35rem 0.4rem 0.25rem;
+    padding: 0.5rem 0.4rem 0.4rem;
   }
 
   .public-calendar .public-header {
-    margin-bottom: 0.25rem;
-  }
-
-  .public-calendar .public-title-ribbon {
-    font-size: clamp(1rem, 5vw, 1.45rem);
-    padding: 0.35rem 1.35rem;
-  }
-
-  .public-calendar .public-title-ribbon::before,
-  .public-calendar .public-title-ribbon::after {
-    width: 0.65rem;
-  }
-
-  .public-calendar .public-title-ribbon::before {
-    left: -0.45rem;
-  }
-
-  .public-calendar .public-title-ribbon::after {
-    right: -0.45rem;
+    margin-bottom: 0.4rem;
   }
 
   .public-calendar .public-header h1 {
+    font-size: clamp(1.1rem, 5.5vw, 1.6rem);
     margin-bottom: 0;
   }
 
@@ -1480,10 +1411,8 @@ textarea:focus {
   .public-calendar .public-day-grid {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(6, 1fr);
-    column-gap: 1.25rem;
-    row-gap: 0.35rem;
+    gap: 1.25rem;
     padding-inline: 1rem;
-    padding-block: 0;
     max-width: none;
     width: 100%;
   }
@@ -1493,9 +1422,6 @@ textarea:focus {
     width: 100%;
     height: 100%;
     min-height: 0;
-  }
-
-  .public-calendar .day-tile-media {
     border-radius: 8px;
   }
 

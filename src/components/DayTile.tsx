@@ -36,21 +36,19 @@ export function DayTile({ day, previewDate, year, onOpen, onLockedClick }: DayTi
       onClick={handleClick}
       aria-label={`Day ${day.dayNumber}${showLock ? ', locked — solve the riddle to unlock early' : showOverlay ? ', upcoming' : ''}`}
     >
-      <span className="day-tile-media">
-        <img
-          className="day-tile-image"
-          src={getLegacyDayImageUrl(day.dayNumber)}
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-        {showOverlay && <span className="day-tile-lock-overlay" aria-hidden="true" />}
-        {showLock && (
-          <span className="day-tile-icon" aria-hidden="true">
-            <Lock strokeWidth={2} />
-          </span>
-        )}
-      </span>
+      <img
+        className="day-tile-image"
+        src={getLegacyDayImageUrl(day.dayNumber)}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+      {showOverlay && <span className="day-tile-lock-overlay" aria-hidden="true" />}
+      {showLock && (
+        <span className="day-tile-icon" aria-hidden="true">
+          <Lock strokeWidth={2} />
+        </span>
+      )}
     </button>
   );
 }
