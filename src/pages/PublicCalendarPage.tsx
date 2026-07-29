@@ -70,7 +70,7 @@ export function PublicCalendarPage() {
           />
         ))}
       </div>
-      <PublicCalendarFooter year={calendar.year} />
+      <PublicCalendarFooter />
       {riddleDay && (
         <RiddleModal
           prompt={riddleDay.riddlePrompt ?? ''}
