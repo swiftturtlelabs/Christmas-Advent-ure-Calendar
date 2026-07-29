@@ -435,14 +435,9 @@ main {
 }
 
 .phone-frame__screen .public-calendar .public-header {
-  margin: 0 -0.4rem 0.55rem;
-  padding: 2.35rem 0.75rem 0.7rem;
-  background: linear-gradient(
-    90deg,
-    rgba(245, 192, 76, 0.24),
-    rgba(245, 192, 76, 0.52),
-    rgba(245, 192, 76, 0.24)
-  );
+  margin: 2.1rem -0.4rem 0.55rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(245, 192, 76, 0.42);
 }
 
 .phone-frame__screen .public-calendar .public-header h1 {
@@ -1096,15 +1091,9 @@ textarea:focus {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  margin: -0.75rem -1rem 0.85rem;
-  padding: 0.9rem 1rem 0.7rem;
-  background: linear-gradient(
-    90deg,
-    rgba(245, 192, 76, 0.22),
-    rgba(245, 192, 76, 0.48),
-    rgba(245, 192, 76, 0.22)
-  );
-  box-shadow: 0 1px 0 rgba(255, 253, 248, 0.18);
+  margin: 0.55rem -1rem 0.85rem;
+  padding: 0.7rem 1rem;
+  background: rgba(245, 192, 76, 0.42);
 }
 
 .page.public-calendar {
@@ -1654,8 +1643,9 @@ textarea:focus {
   }
 
   .public-calendar .public-header {
-    margin: 0 -0.4rem 0.55rem;
-    padding: 1.15rem 0.75rem 0.7rem;
+    margin: 0.85rem -0.4rem 0.55rem;
+    padding: 0.65rem 0.75rem;
+    background: rgba(245, 192, 76, 0.42);
   }
 
   .public-calendar .public-header h1 {
