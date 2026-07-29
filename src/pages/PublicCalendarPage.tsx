@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DayTile } from '../components/DayTile';
-import { PreviewDateBanner } from '../components/PreviewDateBanner';
 import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
@@ -45,7 +44,6 @@ export function PublicCalendarPage() {
   return (
     <div className="page public-calendar">
       <Snowfall />
-      <PreviewDateBanner />
       <header className="public-header">
         <h1>{calendar.title}</h1>
       </header>

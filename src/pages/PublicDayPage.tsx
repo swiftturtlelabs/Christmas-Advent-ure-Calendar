@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { PreviewDateBanner } from '../components/PreviewDateBanner';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
@@ -47,7 +46,6 @@ export function PublicDayPage() {
     return (
       <div className="page public-day locked-view">
         <Snowfall />
-        <PreviewDateBanner />
         <div className="card day-card">
           <h1>Day {day.dayNumber}</h1>
           <p>Not yet! This adventure opens on December {day.dayNumber}.</p>
@@ -60,7 +58,6 @@ export function PublicDayPage() {
   return (
     <div className="page public-day">
       <Snowfall />
-      <PreviewDateBanner />
       <div className="day-scene card">
         <img
           className="tree-image"
