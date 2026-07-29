@@ -51,6 +51,7 @@ export function PublicCalendarPage() {
       <Snowfall />
       <header className="public-header">
         <h1>{calendar.title}</h1>
+        <p className="public-header-year">{calendar.year}</p>
       </header>
       <div className="public-day-grid">
         {days.map((day) => (

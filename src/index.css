@@ -436,14 +436,18 @@ main {
 
 .phone-frame__screen .public-calendar .public-header {
   margin: 2.1rem -0.4rem 0.55rem;
-  padding: 0.65rem 0.75rem;
+  padding: 0.65rem 0.85rem;
   background: rgba(245, 192, 76, 0.42);
 }
 
 .phone-frame__screen .public-calendar .public-header h1 {
   color: var(--holly-600);
   font-size: clamp(1.1rem, 7cqi, 1.6rem);
-  margin-bottom: 0;
+  margin: 0;
+}
+
+.phone-frame__screen .public-calendar .public-header-year {
+  font-size: clamp(1rem, 5.5cqi, 1.25rem);
 }
 
 .phone-frame__screen .public-calendar .public-footer {
@@ -1087,7 +1091,10 @@ textarea:focus {
 }
 
 .public-header {
-  text-align: center;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -1113,7 +1120,23 @@ textarea:focus {
 .public-header h1 {
   color: var(--holly-600);
   font-size: clamp(2rem, 5vw, 3.2rem);
-  margin-bottom: 0;
+  margin: 0;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 248, 0.35),
+    0 2px 10px rgba(0, 0, 0, 0.28);
+}
+
+.public-header-year {
+  margin: 0;
+  flex-shrink: 0;
+  color: var(--holly-600);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1;
   text-shadow:
     0 1px 0 rgba(255, 253, 248, 0.35),
     0 2px 10px rgba(0, 0, 0, 0.28);
@@ -1644,14 +1667,18 @@ textarea:focus {
 
   .public-calendar .public-header {
     margin: 0.85rem -0.4rem 0.55rem;
-    padding: 0.65rem 0.75rem;
+    padding: 0.65rem 0.85rem;
     background: rgba(245, 192, 76, 0.42);
   }
 
   .public-calendar .public-header h1 {
     color: var(--holly-600);
     font-size: clamp(1.1rem, 5.5vw, 1.6rem);
-    margin-bottom: 0;
+    margin: 0;
+  }
+
+  .public-calendar .public-header-year {
+    font-size: clamp(1rem, 4.5vw, 1.25rem);
   }
 
   .public-calendar .public-footer {
