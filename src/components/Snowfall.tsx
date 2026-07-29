@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Flake {
   x: number;
@@ -81,5 +82,8 @@ export function Snowfall() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="snowfall" aria-hidden="true" />;
+  return createPortal(
+    <canvas ref={canvasRef} className="snowfall" aria-hidden="true" />,
+    document.body,
+  );
 }

@@ -1,25 +1,49 @@
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { createCalendar, deleteCalendar, listCalendars } from '../lib/calendarService';
+import { PreviewDateModal } from '../components/PreviewDateModal';
+import { createCalendar, deleteCalendar, getDays, listCalendars } from '../lib/calendarService';
+import {
+  getSetupProgress,
+  getSetupStatus,
+  getSetupStatusLabel,
+} from '../lib/calendarProgress';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar } from '../lib/types';
+
+type CalendarProgress = {
+  setupCount: number;
+  total: number;
+  percent: number;
+  status: ReturnType<typeof getSetupStatus>;
+};
 
 export function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const [progressBySlug, setProgressBySlug] = useState<Record<string, CalendarProgress>>({});
   const [title, setTitle] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [previewCalendar, setPreviewCalendar] = useState<Calendar | null>(null);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
     const items = await listCalendars(user.uid);
+    const progressEntries = await Promise.all(
+      items.map(async (cal) => {
+        const days = await getDays(cal.slug);
+        const { setupCount, total, percent } = getSetupProgress(days);
+        const status = getSetupStatus(percent);
+        return [cal.slug, { setupCount, total, percent, status }] as const;
+      }),
+    );
     setCalendars(items);
+    setProgressBySlug(Object.fromEntries(progressEntries));
     setLoading(false);
   };
 
@@ -85,11 +109,41 @@ export function DashboardPage() {
         <p className="muted">No calendars yet. Create your first one above!</p>
       ) : (
         <ul className="calendar-list">
-          {calendars.map((cal) => (
-            <li key={cal.slug} className="card calendar-item">
-              <div>
+          {calendars.map((cal) => {
+            const progress = progressBySlug[cal.slug];
+            return (
+            <li
+              key={cal.slug}
+              className={`card calendar-item${progress?.status === 'complete' ? ' calendar-item-complete' : ''}`}
+            >
+              <div className="calendar-item-main">
                 <h3>{cal.title}</h3>
                 <p className="muted">{cal.year}</p>
+                {progress && (
+                  <div className="calendar-progress">
+                    <div className="calendar-progress-header">
+                      <span className={`calendar-status calendar-status-${progress.status}`}>
+                        {getSetupStatusLabel(progress.status)}
+                      </span>
+                      <span className="calendar-progress-label">
+                        {progress.setupCount} of {progress.total} days · {progress.percent}%
+                      </span>
+                    </div>
+                    <div
+                      className="calendar-progress-bar"
+                      role="progressbar"
+                      aria-valuenow={progress.percent}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`${cal.title} setup progress`}
+                    >
+                      <span
+                        className="calendar-progress-fill"
+                        style={{ width: `${progress.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="calendar-actions">
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/edit`}>
@@ -98,16 +152,30 @@ export function DashboardPage() {
                 <Link className="btn secondary" to={`/app/c/${cal.slug}/qr`}>
                   QR codes
                 </Link>
-                <Link className="btn secondary" to={`/c/${cal.slug}`} target="_blank">
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={() => setPreviewCalendar(cal)}
+                >
                   Preview
-                </Link>
+                </button>
                 <button type="button" className="btn danger" onClick={() => handleDelete(cal.slug)}>
                   Delete
                 </button>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
+      )}
+
+      {previewCalendar && (
+        <PreviewDateModal
+          slug={previewCalendar.slug}
+          title={previewCalendar.title}
+          year={previewCalendar.year}
+          onClose={() => setPreviewCalendar(null)}
+        />
       )}
     </div>
   );

@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { PreviewDateBanner } from '../components/PreviewDateBanner';
 import { Snowfall } from '../components/Snowfall';
+import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
 import { isDayUnlocked } from '../lib/dateLock';
+import { hasDayRiddle } from '../lib/dayRiddle';
+import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
 export function PublicDayPage() {
   const { token } = useParams<{ token: string }>();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const previewDate = parsePreviewDate(`?${searchParams.toString()}`);
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [day, setDay] = useState<DayContent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,18 +38,20 @@ export function PublicDayPage() {
     return <div className="page public">Adventure not found.</div>;
   }
 
-  const unlocked = isDayUnlocked(day.dayNumber, new Date(), calendar.year);
-  const earlyKey = `early-unlock:${calendar.slug}`;
-  const earlyUnlocked = (JSON.parse(localStorage.getItem(earlyKey) ?? '[]') as number[]).includes(day.dayNumber);
+  const unlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), calendar.year);
+  const riddleUnlocked = (location.state as { riddleUnlocked?: boolean } | null)?.riddleUnlocked === true;
+  const canView = unlocked || riddleUnlocked || !hasDayRiddle(day);
+  const calendarPath = withPreviewDate(`/c/${calendar.slug}`, previewDate);
 
-  if (!unlocked && !earlyUnlocked) {
+  if (!canView) {
     return (
       <div className="page public-day locked-view">
         <Snowfall />
+        <PreviewDateBanner />
         <div className="card day-card">
           <h1>Day {day.dayNumber}</h1>
           <p>Not yet! This adventure opens on December {day.dayNumber}.</p>
-          <Link to={`/c/${calendar.slug}`}>← Back to calendar</Link>
+          <Link to={calendarPath}>← Back to calendar</Link>
         </div>
       </div>
     );
@@ -51,6 +60,7 @@ export function PublicDayPage() {
   return (
     <div className="page public-day">
       <Snowfall />
+      <PreviewDateBanner />
       <div className="day-scene card">
         <img
           className="tree-image"
@@ -67,7 +77,7 @@ export function PublicDayPage() {
         </div>
       </div>
       <p className="back-link">
-        <Link to={`/c/${calendar.slug}`}>← Back to all days</Link>
+        <Link to={calendarPath}>← Back to all days</Link>
       </p>
     </div>
   );

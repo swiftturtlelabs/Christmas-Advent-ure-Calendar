@@ -9,10 +9,14 @@ export function generateToken(length = 16): string {
   return generateSlug(length);
 }
 
-export function buildCalendarUrl(slug: string, origin = window.location.origin): string {
-  return `${origin}/c/${slug}`;
+export function buildCalendarUrl(slug: string, origin = window.location.origin, previewDate?: string | null): string {
+  const path = `/c/${slug}`;
+  if (!previewDate) return `${origin}${path}`;
+  return `${origin}${path}?previewDate=${encodeURIComponent(previewDate)}`;
 }
 
-export function buildDayUrl(token: string, origin = window.location.origin): string {
-  return `${origin}/d/${token}`;
+export function buildDayUrl(token: string, origin = window.location.origin, previewDate?: string | null): string {
+  const path = `/d/${token}`;
+  if (!previewDate) return `${origin}${path}`;
+  return `${origin}${path}?previewDate=${encodeURIComponent(previewDate)}`;
 }

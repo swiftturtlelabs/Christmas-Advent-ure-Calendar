@@ -1,18 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DayTile } from '../components/DayTile';
+import { PreviewDateBanner } from '../components/PreviewDateBanner';
+import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
 import { getCalendar, getDays } from '../lib/calendarService';
-import { buildDayUrl } from '../lib/tokens';
+import { hasDayRiddle } from '../lib/dayRiddle';
+import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
 export function PublicCalendarPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const previewDate = parsePreviewDate(`?${searchParams.toString()}`);
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [days, setDays] = useState<DayContent[]>([]);
-  const [earlyUnlocked, setEarlyUnlocked] = useState<number[]>([]);
   const [riddleDay, setRiddleDay] = useState<DayContent | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,22 +30,8 @@ export function PublicCalendarPage() {
     })();
   }, [slug]);
 
-  const storageKey = useMemo(() => (slug ? `early-unlock:${slug}` : ''), [slug]);
-
-  useEffect(() => {
-    if (!storageKey) return;
-    const raw = localStorage.getItem(storageKey);
-    if (raw) setEarlyUnlocked(JSON.parse(raw) as number[]);
-  }, [storageKey]);
-
-  const markEarlyUnlocked = (dayNumber: number) => {
-    const next = Array.from(new Set([...earlyUnlocked, dayNumber]));
-    setEarlyUnlocked(next);
-    localStorage.setItem(storageKey, JSON.stringify(next));
-  };
-
   const openDay = (day: DayContent) => {
-    navigate(`/d/${day.token}`);
+    navigate(withPreviewDate(`/d/${day.token}`, previewDate));
   };
 
   if (loading) {
@@ -55,26 +45,27 @@ export function PublicCalendarPage() {
   return (
     <div className="page public-calendar">
       <Snowfall />
+      <PreviewDateBanner />
       <header className="public-header">
         <h1>{calendar.title}</h1>
-        <p>Christmas Advent-ure Calendar {calendar.year}</p>
       </header>
       <div className="public-day-grid">
         {days.map((day) => (
           <DayTile
             key={day.dayNumber}
             day={day}
+            previewDate={previewDate}
             year={calendar.year}
-            unlockedOverride={earlyUnlocked.includes(day.dayNumber)}
             onOpen={openDay}
             onLockedClick={(d) => {
-              if (d.riddlePrompt && d.answerHash) {
+              if (hasDayRiddle(d)) {
                 setRiddleDay(d);
               }
             }}
           />
         ))}
       </div>
+      <PublicCalendarFooter year={calendar.year} />
       {riddleDay && (
         <RiddleModal
           prompt={riddleDay.riddlePrompt ?? ''}
@@ -82,10 +73,10 @@ export function PublicCalendarPage() {
           answerHash={riddleDay.answerHash}
           onClose={() => setRiddleDay(null)}
           onSuccess={() => {
-            markEarlyUnlocked(riddleDay.dayNumber);
-            const url = buildDayUrl(riddleDay.token);
             setRiddleDay(null);
-            navigate(url.replace(window.location.origin, ''));
+            navigate(withPreviewDate(`/d/${riddleDay.token}`, previewDate), {
+              state: { riddleUnlocked: true },
+            });
           }}
         />
       )}

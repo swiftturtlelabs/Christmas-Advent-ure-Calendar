@@ -14,7 +14,9 @@ import {
   STOCK_ADVENTURES,
 } from '../lib/stockAdventures';
 import { InfoTooltip } from '../components/InfoTooltip';
+import { PreviewDateModal } from '../components/PreviewDateModal';
 import { SuggestionsModal } from '../components/SuggestionsModal';
+import { isDaySetup } from '../lib/calendarProgress';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
 
@@ -30,10 +32,6 @@ function draftFromDay(day: DayContent): DayDraft {
     riddlePrompt: day.riddlePrompt,
     sourceStockId: day.sourceStockId,
   };
-}
-
-function isDaySetup(day: { title?: string; message?: string }): boolean {
-  return Boolean(day.title?.trim() && day.message?.trim());
 }
 
 function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
@@ -79,6 +77,7 @@ export function EditorPage() {
   const [showDayPickerModal, setShowDayPickerModal] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
   const [showMoreFields, setShowMoreFields] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -288,9 +287,9 @@ export function EditorPage() {
           >
             QR codes
           </Link>
-          <Link className="btn secondary" to={`/c/${slug}`} target="_blank">
+          <button type="button" className="btn secondary" onClick={() => setShowPreviewModal(true)}>
             Preview
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -554,6 +553,15 @@ export function EditorPage() {
           usedIds={usedStockIds}
           onSelect={handleApplyStock}
           onClose={() => setShowSuggestions(false)}
+        />
+      )}
+
+      {showPreviewModal && (
+        <PreviewDateModal
+          slug={slug}
+          title={calendar.title}
+          year={calendar.year}
+          onClose={() => setShowPreviewModal(false)}
         />
       )}
     </div>
