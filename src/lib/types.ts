@@ -50,7 +50,6 @@ export interface StockAdventure {
 export interface DayDraft {
   title: string;
   message: string;
-  imageUrl?: string;
   sourceStockId?: string;
 }
 

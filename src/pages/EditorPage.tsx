@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import {
   getCalendar,
   getCalendarAdminConfig,
@@ -31,25 +31,18 @@ function draftFromDay(day: DayContent): DayDraft {
   return {
     title: day.title,
     message: day.message,
-    imageUrl: day.imageUrl,
     sourceStockId: day.sourceStockId,
   };
 }
 
 function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
   if (!saved) {
-    return Boolean(
-      draft.title.trim() ||
-        draft.message.trim() ||
-        draft.imageUrl?.trim() ||
-        draft.sourceStockId,
-    );
+    return Boolean(draft.title.trim() || draft.message.trim() || draft.sourceStockId);
   }
 
   return (
     draft.title !== saved.title ||
     draft.message !== saved.message ||
-    (draft.imageUrl ?? '').trim() !== (saved.imageUrl ?? '').trim() ||
     (draft.sourceStockId ?? '') !== (saved.sourceStockId ?? '')
   );
 }
@@ -74,7 +67,6 @@ export function EditorPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showDayPickerModal, setShowDayPickerModal] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
-  const [showMoreFields, setShowMoreFields] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showCalendarSettings, setShowCalendarSettings] = useState(false);
   const [adminUnlockCode, setAdminUnlockCode] = useState('');
@@ -99,7 +91,6 @@ export function EditorPage() {
     if (day) {
       setDraft(draftFromDay(day));
     }
-    setShowMoreFields(false);
   }, [selectedDay, days]);
 
   useEffect(() => {
@@ -436,33 +427,6 @@ export function EditorPage() {
               required
             />
           </label>
-          <div className="more-fields">
-            <button
-              type="button"
-              className="more-fields-toggle"
-              aria-expanded={showMoreFields}
-              onClick={() => setShowMoreFields((open) => !open)}
-            >
-              <ChevronDown
-                size={18}
-                strokeWidth={2.4}
-                className={`more-fields-chevron ${showMoreFields ? 'open' : ''}`}
-              />
-              {showMoreFields ? 'Less' : 'More'}
-            </button>
-            {showMoreFields && (
-              <div className="more-fields-body">
-                <label>
-                  Image URL (optional)
-                  <input
-                    value={draft.imageUrl ?? ''}
-                    onChange={(e) => setDraft({ ...draft, imageUrl: e.target.value })}
-                    placeholder="https://…"
-                  />
-                </label>
-              </div>
-            )}
-          </div>
           <button
             type="submit"
             className="btn primary"

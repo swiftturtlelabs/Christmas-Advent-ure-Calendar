@@ -143,13 +143,6 @@ export async function saveDay(
     updatedAt: new Date().toISOString(),
   };
 
-  const imageUrl = draft.imageUrl?.trim();
-  if (imageUrl) {
-    updated.imageUrl = imageUrl;
-  } else if (existing?.imageUrl) {
-    updated.imageUrl = deleteField();
-  }
-
   const sourceStockId = draft.sourceStockId?.trim();
   if (sourceStockId) {
     updated.sourceStockId = sourceStockId;
