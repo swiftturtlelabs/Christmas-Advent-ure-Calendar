@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { DayScene } from '../components/DayScene';
 import { PhoneFrame } from '../components/PhoneFrame';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
@@ -67,21 +68,13 @@ export function PublicDayPage() {
   return framed(
     <div className="page public-day">
       <Snowfall />
-      <div className="day-scene card">
-        <img
-          className="tree-image"
-          src="/tree.jpg"
-          alt="Christmas tree"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
-        <div className="day-overlay">
-          <h1>{day.title || `Day ${day.dayNumber}`}</h1>
+      <DayScene>
+        <h1>{day.title || `Day ${day.dayNumber}`}</h1>
+        <div className="day-overlay__body">
           <p className="day-message">{day.message || 'Your adventure awaits!'}</p>
           {day.imageUrl && <img className="day-custom-image" src={day.imageUrl} alt="" />}
         </div>
-      </div>
+      </DayScene>
       <p className="back-link">
         <Link to={calendarPath}>← Back to all days</Link>
       </p>
