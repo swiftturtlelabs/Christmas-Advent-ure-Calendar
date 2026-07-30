@@ -14,15 +14,13 @@ import {
   rankSuggestions,
   STOCK_ADVENTURES,
 } from '../lib/stockAdventures';
-import { InfoTooltip } from '../components/InfoTooltip';
 import { CalendarSettingsModal } from '../components/CalendarSettingsModal';
 import { PreviewDateModal } from '../components/PreviewDateModal';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { isDaySetup } from '../lib/calendarProgress';
-import { calendarAllowsRiddles } from '../lib/calendarLock';
 import { CALENDAR_TITLE_LONG_WARNING, isCalendarTitleLong } from '../lib/calendarTitle';
 import { useAuth } from '../context/AuthContext';
-import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
+import type { Calendar, CalendarSettingsPatch, DayContent, DayDraft, StockAdventure } from '../lib/types';
 
 type LeaveAction =
   | { type: 'day'; dayNumber: number }
@@ -33,7 +31,6 @@ function draftFromDay(day: DayContent): DayDraft {
     title: day.title,
     message: day.message,
     imageUrl: day.imageUrl,
-    riddlePrompt: day.riddlePrompt,
     sourceStockId: day.sourceStockId,
   };
 }
@@ -44,8 +41,6 @@ function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
       draft.title.trim() ||
         draft.message.trim() ||
         draft.imageUrl?.trim() ||
-        draft.riddlePrompt?.trim() ||
-        draft.answer?.trim() ||
         draft.sourceStockId,
     );
   }
@@ -54,9 +49,7 @@ function isDraftDirty(draft: DayDraft, saved: DayContent | undefined): boolean {
     draft.title !== saved.title ||
     draft.message !== saved.message ||
     (draft.imageUrl ?? '').trim() !== (saved.imageUrl ?? '').trim() ||
-    (draft.riddlePrompt ?? '').trim() !== (saved.riddlePrompt ?? '').trim() ||
-    (draft.sourceStockId ?? '') !== (saved.sourceStockId ?? '') ||
-    Boolean(draft.answer?.trim())
+    (draft.sourceStockId ?? '') !== (saved.sourceStockId ?? '')
   );
 }
 
@@ -142,7 +135,6 @@ export function EditorPage() {
   );
   const selectedIsSetup = isDaySetup(savedDay ?? { title: '', message: '' });
   const canSave = Boolean(draft.title.trim() && draft.message.trim());
-  const riddlesEnabled = calendarAllowsRiddles(calendar ?? { lockMode: 'date_riddle' });
 
   if (!slug || !calendar) {
     return <div className="page loading">Loading editor…</div>;
@@ -278,10 +270,11 @@ export function EditorPage() {
     }
   };
 
-  const handleCalendarSettingsSave = async (settings: { lockMode: Calendar['lockMode'] }) => {
+  const handleCalendarSettingsSave = async (settings: CalendarSettingsPatch) => {
     if (!user) return;
     await updateCalendarSettings(slug, user.uid, settings);
-    setCalendar((current) => (current ? { ...current, ...settings } : current));
+    const refreshed = await getCalendar(slug);
+    if (refreshed) setCalendar(refreshed);
     setSaveFailed(false);
     setMessage('Calendar settings saved.');
   };
@@ -451,41 +444,6 @@ export function EditorPage() {
                     placeholder="https://…"
                   />
                 </label>
-                {riddlesEnabled ? (
-                  <>
-                    <label>
-                      <span className="label-row">
-                        Early-unlock riddle prompt (optional)
-                        <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
-                      </span>
-                      <input
-                        value={draft.riddlePrompt ?? ''}
-                        onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
-                        placeholder="What do reindeer say?"
-                      />
-                    </label>
-                    <label>
-                      Riddle answer (optional — leave blank to keep current)
-                      <input
-                        value={draft.answer ?? ''}
-                        onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
-                        placeholder="Set a new answer to change it"
-                      />
-                    </label>
-                  </>
-                ) : (
-                  <p className="muted calendar-settings-hint">
-                    Early-unlock riddles are turned off for this calendar.{' '}
-                    <button
-                      type="button"
-                      className="link-button"
-                      onClick={() => setShowCalendarSettings(true)}
-                    >
-                      Open calendar settings
-                    </button>{' '}
-                    to enable them.
-                  </p>
-                )}
               </div>
             )}
           </div>

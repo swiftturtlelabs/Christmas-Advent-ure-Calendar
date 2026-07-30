@@ -4,9 +4,8 @@ import { PhoneFrame } from '../components/PhoneFrame';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
-import { calendarAllowsRiddles } from '../lib/calendarLock';
+import { calendarHasEarlyUnlock, calendarLocksFutureDates } from '../lib/calendarLock';
 import { isDayUnlocked } from '../lib/dateLock';
-import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
@@ -43,14 +42,13 @@ export function PublicDayPage() {
     return framed(<div className="page public">Adventure not found.</div>);
   }
 
+  const lockFutureDates = calendarLocksFutureDates(calendar);
   const unlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), calendar.year);
-  const riddleUnlocked = (location.state as { riddleUnlocked?: boolean } | null)?.riddleUnlocked === true;
-  const riddlesEnabled = calendarAllowsRiddles(calendar);
+  const earlyUnlocked = (location.state as { riddleUnlocked?: boolean } | null)?.riddleUnlocked === true;
   const canView =
+    !lockFutureDates ||
     unlocked ||
-    (riddlesEnabled && riddleUnlocked) ||
-    !riddlesEnabled ||
-    !hasDayRiddle(day);
+    (calendarHasEarlyUnlock(calendar) && earlyUnlocked);
   const calendarPath = withPreviewDate(`/c/${calendar.slug}`, previewDate);
 
   if (!canView) {

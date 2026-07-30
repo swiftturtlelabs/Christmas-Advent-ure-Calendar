@@ -6,9 +6,8 @@ import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
 import { getCalendar, getDays } from '../lib/calendarService';
-import { calendarAllowsRiddles } from '../lib/calendarLock';
+import { calendarHasEarlyUnlock, calendarLocksFutureDates } from '../lib/calendarLock';
 import { publicCalendarTitleFontSize } from '../lib/calendarTitle';
-import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
@@ -23,7 +22,7 @@ export function PublicCalendarPage() {
   const previewDate = parsePreviewDate(`?${searchParams.toString()}`);
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [days, setDays] = useState<DayContent[]>([]);
-  const [riddleDay, setRiddleDay] = useState<DayContent | null>(null);
+  const [unlockDay, setUnlockDay] = useState<DayContent | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,7 +47,8 @@ export function PublicCalendarPage() {
     return framed(<div className="page public">Calendar not found.</div>);
   }
 
-  const riddlesEnabled = calendarAllowsRiddles(calendar);
+  const lockFutureDates = calendarLocksFutureDates(calendar);
+  const earlyUnlockEnabled = calendarHasEarlyUnlock(calendar);
 
   return framed(
     <div className="page public-calendar">
@@ -64,26 +64,23 @@ export function PublicCalendarPage() {
             day={day}
             previewDate={previewDate}
             year={calendar.year}
-            riddlesEnabled={riddlesEnabled}
+            lockFutureDates={lockFutureDates}
+            earlyUnlockEnabled={earlyUnlockEnabled}
             onOpen={openDay}
-            onLockedClick={(d) => {
-              if (riddlesEnabled && hasDayRiddle(d)) {
-                setRiddleDay(d);
-              }
-            }}
+            onLockedClick={setUnlockDay}
           />
         ))}
       </div>
       <PublicCalendarFooter />
-      {riddlesEnabled && riddleDay && (
+      {earlyUnlockEnabled && unlockDay && (
         <RiddleModal
-          prompt={riddleDay.riddlePrompt ?? ''}
-          answerSalt={riddleDay.answerSalt}
-          answerHash={riddleDay.answerHash}
-          onClose={() => setRiddleDay(null)}
+          prompt={calendar.unlockPrompt ?? ''}
+          answerSalt={calendar.unlockAnswerSalt}
+          answerHash={calendar.unlockAnswerHash}
+          onClose={() => setUnlockDay(null)}
           onSuccess={() => {
-            setRiddleDay(null);
-            navigate(withPreviewDate(`/d/${riddleDay.token}`, previewDate), {
+            setUnlockDay(null);
+            navigate(withPreviewDate(`/d/${unlockDay.token}`, previewDate), {
               state: { riddleUnlocked: true },
             });
           }}

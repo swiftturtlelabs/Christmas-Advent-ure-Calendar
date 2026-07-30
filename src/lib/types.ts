@@ -10,7 +10,10 @@ export interface Calendar {
   ownerUid: string;
   title: string;
   year: number;
-  lockMode: 'date_only' | 'date_riddle';
+  lockMode: 'open' | 'date_locked';
+  unlockPrompt?: string;
+  unlockAnswerHash?: string;
+  unlockAnswerSalt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,9 +23,6 @@ export interface DayContent {
   title: string;
   message: string;
   imageUrl?: string;
-  riddlePrompt?: string;
-  answerHash?: string;
-  answerSalt?: string;
   sourceStockId?: string;
   token: string;
   updatedAt: string;
@@ -51,7 +51,11 @@ export interface DayDraft {
   title: string;
   message: string;
   imageUrl?: string;
-  riddlePrompt?: string;
-  answer?: string;
   sourceStockId?: string;
+}
+
+export interface CalendarSettingsPatch {
+  lockMode: Calendar['lockMode'];
+  unlockPrompt?: string;
+  unlockAnswer?: string;
 }

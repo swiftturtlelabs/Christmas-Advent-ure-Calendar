@@ -1,6 +1,5 @@
 import { Lock } from 'lucide-react';
 import { getAppNow } from '../lib/appDate';
-import { hasDayRiddle } from '../lib/dayRiddle';
 import { isDayUnlocked } from '../lib/dateLock';
 import { getLegacyDayImageUrl } from '../lib/legacyDayImages';
 import type { DayContent } from '../lib/types';
@@ -9,7 +8,8 @@ interface DayTileProps {
   day: DayContent;
   previewDate?: string | null;
   year: number;
-  riddlesEnabled?: boolean;
+  lockFutureDates?: boolean;
+  earlyUnlockEnabled?: boolean;
   onOpen: (day: DayContent) => void;
   onLockedClick: (day: DayContent) => void;
 }
@@ -18,31 +18,34 @@ export function DayTile({
   day,
   previewDate,
   year,
-  riddlesEnabled = true,
+  lockFutureDates = false,
+  earlyUnlockEnabled = false,
   onOpen,
   onLockedClick,
 }: DayTileProps) {
   const dateUnlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), year);
-  const hasRiddle = riddlesEnabled && hasDayRiddle(day);
-  const showOverlay = !dateUnlocked;
-  const showLock = !dateUnlocked && hasRiddle;
+  const isLocked = lockFutureDates && !dateUnlocked;
+  const showOverlay = isLocked;
+  const showLock = isLocked && earlyUnlockEnabled;
 
   const handleClick = () => {
-    if (dateUnlocked || !hasRiddle) {
+    if (!isLocked) {
       onOpen(day);
-    } else {
+    } else if (earlyUnlockEnabled) {
       onLockedClick(day);
+    } else {
+      onOpen(day);
     }
   };
 
-  const tileState = dateUnlocked ? 'accessible' : hasRiddle ? 'locked' : 'future';
+  const tileState = !isLocked ? 'accessible' : earlyUnlockEnabled ? 'locked' : 'future';
 
   return (
     <button
       type="button"
       className={`day-tile ${tileState}`}
       onClick={handleClick}
-      aria-label={`Day ${day.dayNumber}${showLock ? ', locked — solve the riddle to unlock early' : showOverlay ? ', upcoming' : ''}`}
+      aria-label={`Day ${day.dayNumber}${showLock ? ', locked — enter the password to unlock early' : showOverlay ? ', upcoming' : ''}`}
     >
       <span className="day-tile-image-wrap">
         <img

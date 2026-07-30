@@ -15,7 +15,7 @@ import { db } from './firebase';
 import { generateSalt, hashAnswer } from './riddle';
 import { generateSlug, generateToken } from './tokens';
 import { STOCK_ADVENTURES } from './stockAdventures';
-import type { Calendar, DayContent, DayDraft, UserProfile } from './types';
+import type { Calendar, CalendarSettingsPatch, DayContent, DayDraft, UserProfile } from './types';
 
 export async function ensureUserProfile(user: {
   uid: string;
@@ -50,7 +50,7 @@ export async function createCalendar(ownerUid: string, title: string, year: numb
     ownerUid,
     title,
     year,
-    lockMode: 'date_riddle',
+    lockMode: 'open',
     createdAt: now,
     updatedAt: now,
   };
@@ -150,22 +150,6 @@ export async function saveDay(
     updated.imageUrl = deleteField();
   }
 
-  const riddlePrompt = draft.riddlePrompt?.trim();
-  if (riddlePrompt) {
-    updated.riddlePrompt = riddlePrompt;
-  } else if (existing?.riddlePrompt) {
-    updated.riddlePrompt = deleteField();
-  }
-
-  if (draft.answer?.trim()) {
-    const answerSalt = generateSalt();
-    updated.answerSalt = answerSalt;
-    updated.answerHash = await hashAnswer(draft.answer, answerSalt);
-  } else if (draft.answer === '') {
-    updated.answerHash = deleteField();
-    updated.answerSalt = deleteField();
-  }
-
   const sourceStockId = draft.sourceStockId?.trim();
   if (sourceStockId) {
     updated.sourceStockId = sourceStockId;
@@ -208,13 +192,30 @@ export async function updateCalendarTitle(slug: string, ownerUid: string, title:
 export async function updateCalendarSettings(
   slug: string,
   ownerUid: string,
-  settings: Pick<Calendar, 'lockMode'>,
+  patch: CalendarSettingsPatch,
 ): Promise<void> {
   const cal = await getCalendar(slug);
   if (!cal || cal.ownerUid !== ownerUid) throw new Error('Not authorized');
-  await setDoc(
-    doc(db, 'calendars', slug),
-    { ...settings, updatedAt: new Date().toISOString() },
-    { merge: true },
-  );
+
+  const updated: UpdateData<Calendar> = {
+    lockMode: patch.lockMode,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (patch.unlockPrompt !== undefined) {
+    const unlockPrompt = patch.unlockPrompt.trim();
+    if (unlockPrompt) {
+      updated.unlockPrompt = unlockPrompt;
+    } else {
+      updated.unlockPrompt = deleteField();
+    }
+  }
+
+  if (patch.unlockAnswer?.trim()) {
+    const unlockAnswerSalt = generateSalt();
+    updated.unlockAnswerSalt = unlockAnswerSalt;
+    updated.unlockAnswerHash = await hashAnswer(patch.unlockAnswer, unlockAnswerSalt);
+  }
+
+  await setDoc(doc(db, 'calendars', slug), updated, { merge: true });
 }

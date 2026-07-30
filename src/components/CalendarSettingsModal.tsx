@@ -1,28 +1,37 @@
 import { useState } from 'react';
 import { InfoTooltip } from './InfoTooltip';
-import type { CalendarLockMode } from '../lib/calendarLock';
+import { calendarLocksFutureDates } from '../lib/calendarLock';
+import type { CalendarSettingsPatch } from '../lib/types';
 import type { Calendar } from '../lib/types';
-
-export interface CalendarSettingsDraft {
-  lockMode: CalendarLockMode;
-}
 
 interface CalendarSettingsModalProps {
   calendar: Calendar;
-  onSave: (settings: CalendarSettingsDraft) => Promise<void>;
+  onSave: (settings: CalendarSettingsPatch) => Promise<void>;
   onClose: () => void;
 }
 
 export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSettingsModalProps) {
-  const [lockMode, setLockMode] = useState<CalendarLockMode>(calendar.lockMode ?? 'date_riddle');
+  const [lockFutureDates, setLockFutureDates] = useState(calendarLocksFutureDates(calendar));
+  const [unlockPrompt, setUnlockPrompt] = useState(calendar.unlockPrompt ?? '');
+  const [unlockAnswer, setUnlockAnswer] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const hasExistingPassword = Boolean(calendar.unlockAnswerHash);
 
   const handleSave = async () => {
+    if (lockFutureDates && !unlockAnswer.trim() && !hasExistingPassword) {
+      setError('Enter a password or answer to lock future dates.');
+      return;
+    }
+
     setSaving(true);
     setError('');
     try {
-      await onSave({ lockMode });
+      await onSave({
+        lockMode: lockFutureDates ? 'date_locked' : 'open',
+        unlockPrompt,
+        unlockAnswer: unlockAnswer.trim() || undefined,
+      });
       onClose();
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'Unknown error';
@@ -50,43 +59,52 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
           <h3 id="calendar-settings-lock-heading" className="calendar-settings-section-title">
             <span className="label-row">
               Day locking
-              <InfoTooltip text="Visitors see days unlock on their calendar date in December. When early-unlock riddles are enabled, you can add a riddle to any individual day so visitors can open it early." />
+              <InfoTooltip text="By default all days are open. Turn on locking to keep future days hidden until their December date. You can optionally let visitors unlock early with a shared password." />
             </span>
           </h3>
 
-          <fieldset className="calendar-settings-options">
-            <legend className="sr-only">Early-unlock riddles</legend>
-            <label className="calendar-settings-option">
-              <input
-                type="radio"
-                name="lock-mode"
-                value="date_riddle"
-                checked={lockMode === 'date_riddle'}
-                onChange={() => setLockMode('date_riddle')}
-              />
-              <span>
-                <strong>Date lock with optional riddles</strong>
-                <span className="muted">
-                  Days stay locked until their date. Per-day riddles can unlock them early.
-                </span>
+          <label className="calendar-settings-toggle">
+            <input
+              type="checkbox"
+              checked={lockFutureDates}
+              onChange={(e) => setLockFutureDates(e.target.checked)}
+            />
+            <span>
+              <strong>Lock future dates</strong>
+              <span className="muted">
+                Days stay closed until their calendar date in December.
               </span>
-            </label>
-            <label className="calendar-settings-option">
-              <input
-                type="radio"
-                name="lock-mode"
-                value="date_only"
-                checked={lockMode === 'date_only'}
-                onChange={() => setLockMode('date_only')}
-              />
-              <span>
-                <strong>Date lock only</strong>
-                <span className="muted">
-                  Days unlock only on their calendar date. Riddles are not offered to visitors.
-                </span>
-              </span>
-            </label>
-          </fieldset>
+            </span>
+          </label>
+
+          {lockFutureDates && (
+            <div className="calendar-settings-lock-fields">
+              <label>
+                Question or hint (optional)
+                <input
+                  value={unlockPrompt}
+                  onChange={(e) => setUnlockPrompt(e.target.value)}
+                  placeholder="What is the family codeword?"
+                />
+              </label>
+              <label>
+                Password or answer
+                <input
+                  type="password"
+                  value={unlockAnswer}
+                  onChange={(e) => setUnlockAnswer(e.target.value)}
+                  placeholder={
+                    hasExistingPassword ? 'Leave blank to keep current password' : 'Required to lock future dates'
+                  }
+                  autoComplete="new-password"
+                />
+              </label>
+              <p className="muted calendar-settings-hint">
+                Visitors who know the password can open locked days early. The question is optional — leave it blank
+                to show a generic unlock prompt.
+              </p>
+            </div>
+          )}
         </section>
 
         {error && <p className="error">{error}</p>}

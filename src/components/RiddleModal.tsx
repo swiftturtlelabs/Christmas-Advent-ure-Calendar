@@ -31,14 +31,15 @@ export function RiddleModal({ prompt, answerSalt, answerHash, onSuccess, onClose
     <div className="modal-backdrop" role="dialog" aria-modal="true">
       <div className="modal card">
         <h2>Early unlock</h2>
-        <p>{prompt || 'Answer the secret question to open this day early.'}</p>
+        <p>{prompt || 'Enter the password to open this day early.'}</p>
         <form onSubmit={handleSubmit}>
           <input
-            type="text"
+            type="password"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Your answer"
+            placeholder="Password or answer"
             autoFocus
+            autoComplete="off"
           />
           {error && <p className="error">{error}</p>}
           <div className="modal-actions">
