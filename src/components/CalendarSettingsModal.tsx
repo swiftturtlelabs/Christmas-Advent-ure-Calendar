@@ -16,11 +16,11 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
   const [unlockAnswer, setUnlockAnswer] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const hasExistingPassword = Boolean(calendar.unlockAnswerHash);
+  const hasExistingCode = Boolean(calendar.unlockAnswerHash);
 
   const handleSave = async () => {
-    if (lockFutureDates && !unlockAnswer.trim() && !hasExistingPassword) {
-      setError('Enter a password or answer to lock future dates.');
+    if (lockFutureDates && !unlockAnswer.trim() && !hasExistingCode) {
+      setError('Enter a code to lock future dates.');
       return;
     }
 
@@ -59,7 +59,7 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
           <h3 id="calendar-settings-lock-heading" className="calendar-settings-section-title">
             <span className="label-row">
               Day locking
-              <InfoTooltip text="By default all days are open. Turn on locking to keep future days hidden until their December date. You can optionally let visitors unlock early with a shared password." />
+              <InfoTooltip text="By default all days are open. Turn on locking to keep future days hidden until their December date. You can optionally let visitors unlock early with a shared code." />
             </span>
           </h3>
 
@@ -88,20 +88,19 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
                 />
               </label>
               <label>
-                Password or answer
+                Code
                 <input
-                  type="password"
                   value={unlockAnswer}
                   onChange={(e) => setUnlockAnswer(e.target.value)}
                   placeholder={
-                    hasExistingPassword ? 'Leave blank to keep current password' : 'Required to lock future dates'
+                    hasExistingCode ? 'Leave blank to keep current code' : 'Required to lock future dates'
                   }
-                  autoComplete="new-password"
+                  autoComplete="off"
                 />
               </label>
               <p className="muted calendar-settings-hint">
-                Visitors who know the password can open locked days early. The question is optional — leave it blank
-                to show a generic unlock prompt.
+                Visitors who know the code can open locked days early. The question is optional — leave it blank to
+                show a generic unlock prompt.
               </p>
             </div>
           )}

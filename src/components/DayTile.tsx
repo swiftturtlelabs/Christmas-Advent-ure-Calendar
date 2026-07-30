@@ -24,28 +24,28 @@ export function DayTile({
   onLockedClick,
 }: DayTileProps) {
   const dateUnlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), year);
-  const isLocked = lockFutureDates && !dateUnlocked;
-  const showOverlay = isLocked;
-  const showLock = isLocked && earlyUnlockEnabled;
+  const showOverlay = !dateUnlocked;
+  const isDateLocked = lockFutureDates && !dateUnlocked;
+  const showLock = isDateLocked && earlyUnlockEnabled;
 
   const handleClick = () => {
-    if (!isLocked) {
+    if (dateUnlocked) {
       onOpen(day);
-    } else if (earlyUnlockEnabled) {
+    } else if (isDateLocked && earlyUnlockEnabled) {
       onLockedClick(day);
     } else {
       onOpen(day);
     }
   };
 
-  const tileState = !isLocked ? 'accessible' : earlyUnlockEnabled ? 'locked' : 'future';
+  const tileState = dateUnlocked ? 'accessible' : showLock ? 'locked' : 'future';
 
   return (
     <button
       type="button"
       className={`day-tile ${tileState}`}
       onClick={handleClick}
-      aria-label={`Day ${day.dayNumber}${showLock ? ', locked — enter the password to unlock early' : showOverlay ? ', upcoming' : ''}`}
+      aria-label={`Day ${day.dayNumber}${showLock ? ', locked — enter the code to unlock early' : showOverlay ? ', upcoming' : ''}`}
     >
       <span className="day-tile-image-wrap">
         <img
