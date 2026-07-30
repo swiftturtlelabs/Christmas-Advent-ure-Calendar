@@ -1,3 +1,4 @@
+import JSZip from 'jszip';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -11,11 +12,24 @@ interface QrItem {
   dataUrl: string;
 }
 
+function pngFileName(label: string) {
+  return `${label.replace(/\s+/g, '-').toLowerCase()}.png`;
+}
+
+function dataUrlToBlob(dataUrl: string) {
+  const base64 = dataUrl.split(',')[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: 'image/png' });
+}
+
 export function QrExportPage() {
   const { slug } = useParams<{ slug: string }>();
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [items, setItems] = useState<QrItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [zipping, setZipping] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -44,8 +58,28 @@ export function QrExportPage() {
   const download = (item: QrItem) => {
     const a = document.createElement('a');
     a.href = item.dataUrl;
-    a.download = `${item.label.replace(/\s+/g, '-').toLowerCase()}.png`;
+    a.download = pngFileName(item.label);
     a.click();
+  };
+
+  const downloadAllZip = async () => {
+    if (!slug || items.length === 0) return;
+    setZipping(true);
+    try {
+      const zip = new JSZip();
+      for (const item of items) {
+        zip.file(pngFileName(item.label), dataUrlToBlob(item.dataUrl));
+      }
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${slug}-qr-codes.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setZipping(false);
+    }
   };
 
   const printSheet = () => {
@@ -61,9 +95,19 @@ export function QrExportPage() {
       <div className="editor-header">
         <Link to={`/app/c/${slug}/edit`}>← Back to editor</Link>
         <h1>QR codes — {calendar.title}</h1>
-        <button type="button" className="btn primary print-hide" onClick={printSheet}>
-          Print sheet
-        </button>
+        <div className="editor-header-actions print-hide">
+          <button
+            type="button"
+            className="btn secondary"
+            onClick={downloadAllZip}
+            disabled={zipping}
+          >
+            {zipping ? 'Creating ZIP…' : 'Download all (ZIP)'}
+          </button>
+          <button type="button" className="btn primary" onClick={printSheet}>
+            Print sheet
+          </button>
+        </div>
       </div>
       <p className="muted print-hide">
         These URLs stay the same even when you edit adventure content. Re-print only if you delete and recreate the calendar.
