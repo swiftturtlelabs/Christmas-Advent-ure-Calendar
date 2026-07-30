@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import {
   getCalendar,
+  getCalendarAdminConfig,
   getDays,
   saveDay,
   updateCalendarSettings,
@@ -76,6 +77,7 @@ export function EditorPage() {
   const [showMoreFields, setShowMoreFields] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showCalendarSettings, setShowCalendarSettings] = useState(false);
+  const [adminUnlockCode, setAdminUnlockCode] = useState('');
 
   useEffect(() => {
     if (!slug) return;
@@ -275,8 +277,22 @@ export function EditorPage() {
     await updateCalendarSettings(slug, user.uid, settings);
     const refreshed = await getCalendar(slug);
     if (refreshed) setCalendar(refreshed);
+    if (settings.unlockAnswer) setAdminUnlockCode(settings.unlockAnswer);
     setSaveFailed(false);
     setMessage('Calendar settings saved.');
+  };
+
+  const openCalendarSettings = async () => {
+    if (!user) return;
+    try {
+      const adminConfig = await getCalendarAdminConfig(slug, user.uid);
+      setAdminUnlockCode(adminConfig?.unlockCode ?? '');
+      setShowCalendarSettings(true);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'Unknown error';
+      setSaveFailed(true);
+      setMessage(`Could not load calendar settings: ${detail}`);
+    }
   };
 
   return (
@@ -290,7 +306,7 @@ export function EditorPage() {
           <button
             type="button"
             className="btn secondary"
-            onClick={() => setShowCalendarSettings(true)}
+            onClick={() => openCalendarSettings()}
           >
             <Settings size={16} strokeWidth={2.2} aria-hidden="true" />
             Settings
@@ -574,6 +590,7 @@ export function EditorPage() {
       {showCalendarSettings && (
         <CalendarSettingsModal
           calendar={calendar}
+          initialUnlockCode={adminUnlockCode}
           onSave={handleCalendarSettingsSave}
           onClose={() => setShowCalendarSettings(false)}
         />

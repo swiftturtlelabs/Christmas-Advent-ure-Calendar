@@ -15,7 +15,7 @@ import { db } from './firebase';
 import { generateSalt, hashAnswer } from './riddle';
 import { generateSlug, generateToken } from './tokens';
 import { STOCK_ADVENTURES } from './stockAdventures';
-import type { Calendar, CalendarSettingsPatch, DayContent, DayDraft, UserProfile } from './types';
+import type { Calendar, CalendarAdminConfig, CalendarSettingsPatch, DayContent, DayDraft, UserProfile } from './types';
 
 export async function ensureUserProfile(user: {
   uid: string;
@@ -189,6 +189,17 @@ export async function updateCalendarTitle(slug: string, ownerUid: string, title:
   await setDoc(doc(db, 'calendars', slug), { title, updatedAt: new Date().toISOString() }, { merge: true });
 }
 
+export async function getCalendarAdminConfig(
+  slug: string,
+  ownerUid: string,
+): Promise<CalendarAdminConfig | null> {
+  const cal = await getCalendar(slug);
+  if (!cal || cal.ownerUid !== ownerUid) throw new Error('Not authorized');
+
+  const snap = await getDoc(doc(db, 'calendars', slug, 'adminConfig', 'lock'));
+  return snap.exists() ? (snap.data() as CalendarAdminConfig) : null;
+}
+
 export async function updateCalendarSettings(
   slug: string,
   ownerUid: string,
@@ -215,6 +226,11 @@ export async function updateCalendarSettings(
     const unlockAnswerSalt = generateSalt();
     updated.unlockAnswerSalt = unlockAnswerSalt;
     updated.unlockAnswerHash = await hashAnswer(patch.unlockAnswer, unlockAnswerSalt);
+    await setDoc(
+      doc(db, 'calendars', slug, 'adminConfig', 'lock'),
+      { unlockCode: patch.unlockAnswer.trim() },
+      { merge: true },
+    );
   }
 
   await setDoc(doc(db, 'calendars', slug), updated, { merge: true });

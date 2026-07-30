@@ -40,6 +40,11 @@ service cloud.firestore {
         allow read: if true;
         allow write: if ownsCalendar(slug);
       }
+
+      // Owner-only settings (e.g. plaintext unlock code for the editor).
+      match /adminConfig/{docId} {
+        allow read, write: if ownsCalendar(slug);
+      }
     }
 
     // Token -> {slug, dayNumber} lookup for per-day QR links. Public read so a

@@ -54,6 +54,10 @@ export interface DayDraft {
   sourceStockId?: string;
 }
 
+export interface CalendarAdminConfig {
+  unlockCode?: string;
+}
+
 export interface CalendarSettingsPatch {
   lockMode: Calendar['lockMode'];
   unlockPrompt?: string;

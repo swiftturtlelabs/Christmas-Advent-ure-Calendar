@@ -6,20 +6,26 @@ import type { Calendar } from '../lib/types';
 
 interface CalendarSettingsModalProps {
   calendar: Calendar;
+  initialUnlockCode?: string;
   onSave: (settings: CalendarSettingsPatch) => Promise<void>;
   onClose: () => void;
 }
 
-export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSettingsModalProps) {
+export function CalendarSettingsModal({
+  calendar,
+  initialUnlockCode = '',
+  onSave,
+  onClose,
+}: CalendarSettingsModalProps) {
   const [lockFutureDates, setLockFutureDates] = useState(calendarLocksFutureDates(calendar));
   const [unlockPrompt, setUnlockPrompt] = useState(calendar.unlockPrompt ?? '');
-  const [unlockAnswer, setUnlockAnswer] = useState('');
+  const [unlockCode, setUnlockCode] = useState(initialUnlockCode);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const hasExistingCode = Boolean(calendar.unlockAnswerHash);
+  const hasExistingCode = Boolean(calendar.unlockAnswerHash || initialUnlockCode.trim());
 
   const handleSave = async () => {
-    if (lockFutureDates && !unlockAnswer.trim() && !hasExistingCode) {
+    if (lockFutureDates && !unlockCode.trim() && !hasExistingCode) {
       setError('Enter a code to lock future dates.');
       return;
     }
@@ -30,7 +36,7 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
       await onSave({
         lockMode: lockFutureDates ? 'date_locked' : 'open',
         unlockPrompt,
-        unlockAnswer: unlockAnswer.trim() || undefined,
+        unlockAnswer: unlockCode.trim() || undefined,
       });
       onClose();
     } catch (err) {
@@ -90,11 +96,9 @@ export function CalendarSettingsModal({ calendar, onSave, onClose }: CalendarSet
               <label>
                 Code
                 <input
-                  value={unlockAnswer}
-                  onChange={(e) => setUnlockAnswer(e.target.value)}
-                  placeholder={
-                    hasExistingCode ? 'Leave blank to keep current code' : 'Required to lock future dates'
-                  }
+                  value={unlockCode}
+                  onChange={(e) => setUnlockCode(e.target.value)}
+                  placeholder="Required to lock future dates"
                   autoComplete="off"
                 />
               </label>
