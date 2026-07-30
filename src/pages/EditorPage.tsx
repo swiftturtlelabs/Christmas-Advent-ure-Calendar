@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
 import {
   getCalendar,
   getDays,
   saveDay,
+  updateCalendarSettings,
   updateCalendarTitle,
 } from '../lib/calendarService';
 import {
@@ -14,9 +15,11 @@ import {
   STOCK_ADVENTURES,
 } from '../lib/stockAdventures';
 import { InfoTooltip } from '../components/InfoTooltip';
+import { CalendarSettingsModal } from '../components/CalendarSettingsModal';
 import { PreviewDateModal } from '../components/PreviewDateModal';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { isDaySetup } from '../lib/calendarProgress';
+import { calendarAllowsRiddles } from '../lib/calendarLock';
 import { CALENDAR_TITLE_LONG_WARNING, isCalendarTitleLong } from '../lib/calendarTitle';
 import { useAuth } from '../context/AuthContext';
 import type { Calendar, DayContent, DayDraft, StockAdventure } from '../lib/types';
@@ -79,6 +82,7 @@ export function EditorPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [showMoreFields, setShowMoreFields] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showCalendarSettings, setShowCalendarSettings] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -138,6 +142,7 @@ export function EditorPage() {
   );
   const selectedIsSetup = isDaySetup(savedDay ?? { title: '', message: '' });
   const canSave = Boolean(draft.title.trim() && draft.message.trim());
+  const riddlesEnabled = calendarAllowsRiddles(calendar ?? { lockMode: 'date_riddle' });
 
   if (!slug || !calendar) {
     return <div className="page loading">Loading editor…</div>;
@@ -273,6 +278,14 @@ export function EditorPage() {
     }
   };
 
+  const handleCalendarSettingsSave = async (settings: { lockMode: Calendar['lockMode'] }) => {
+    if (!user) return;
+    await updateCalendarSettings(slug, user.uid, settings);
+    setCalendar((current) => (current ? { ...current, ...settings } : current));
+    setSaveFailed(false);
+    setMessage('Calendar settings saved.');
+  };
+
   return (
     <div className="page editor">
       <div className="editor-header">
@@ -281,6 +294,14 @@ export function EditorPage() {
         </Link>
         <h1>Edit calendar</h1>
         <div className="editor-header-actions">
+          <button
+            type="button"
+            className="btn secondary"
+            onClick={() => setShowCalendarSettings(true)}
+          >
+            <Settings size={16} strokeWidth={2.2} aria-hidden="true" />
+            Settings
+          </button>
           <Link
             className="btn secondary"
             to={`/app/c/${slug}/qr`}
@@ -430,25 +451,41 @@ export function EditorPage() {
                     placeholder="https://…"
                   />
                 </label>
-                <label>
-                  <span className="label-row">
-                    Early-unlock riddle prompt (optional)
-                    <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
-                  </span>
-                  <input
-                    value={draft.riddlePrompt ?? ''}
-                    onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
-                    placeholder="What do reindeer say?"
-                  />
-                </label>
-                <label>
-                  Riddle answer (optional — leave blank to keep current)
-                  <input
-                    value={draft.answer ?? ''}
-                    onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
-                    placeholder="Set a new answer to change it"
-                  />
-                </label>
+                {riddlesEnabled ? (
+                  <>
+                    <label>
+                      <span className="label-row">
+                        Early-unlock riddle prompt (optional)
+                        <InfoTooltip text="If you set a prompt and answer, visitors can solve this riddle to unlock the day early, before its calendar date arrives. Leave both blank to keep the day locked until its date." />
+                      </span>
+                      <input
+                        value={draft.riddlePrompt ?? ''}
+                        onChange={(e) => setDraft({ ...draft, riddlePrompt: e.target.value })}
+                        placeholder="What do reindeer say?"
+                      />
+                    </label>
+                    <label>
+                      Riddle answer (optional — leave blank to keep current)
+                      <input
+                        value={draft.answer ?? ''}
+                        onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
+                        placeholder="Set a new answer to change it"
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <p className="muted calendar-settings-hint">
+                    Early-unlock riddles are turned off for this calendar.{' '}
+                    <button
+                      type="button"
+                      className="link-button"
+                      onClick={() => setShowCalendarSettings(true)}
+                    >
+                      Open calendar settings
+                    </button>{' '}
+                    to enable them.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -573,6 +610,14 @@ export function EditorPage() {
           title={calendar.title}
           year={calendar.year}
           onClose={() => setShowPreviewModal(false)}
+        />
+      )}
+
+      {showCalendarSettings && (
+        <CalendarSettingsModal
+          calendar={calendar}
+          onSave={handleCalendarSettingsSave}
+          onClose={() => setShowCalendarSettings(false)}
         />
       )}
     </div>

@@ -9,13 +9,21 @@ interface DayTileProps {
   day: DayContent;
   previewDate?: string | null;
   year: number;
+  riddlesEnabled?: boolean;
   onOpen: (day: DayContent) => void;
   onLockedClick: (day: DayContent) => void;
 }
 
-export function DayTile({ day, previewDate, year, onOpen, onLockedClick }: DayTileProps) {
+export function DayTile({
+  day,
+  previewDate,
+  year,
+  riddlesEnabled = true,
+  onOpen,
+  onLockedClick,
+}: DayTileProps) {
   const dateUnlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), year);
-  const hasRiddle = hasDayRiddle(day);
+  const hasRiddle = riddlesEnabled && hasDayRiddle(day);
   const showOverlay = !dateUnlocked;
   const showLock = !dateUnlocked && hasRiddle;
 

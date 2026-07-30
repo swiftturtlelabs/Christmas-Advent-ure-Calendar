@@ -6,6 +6,7 @@ import { PublicCalendarFooter } from '../components/PublicCalendarFooter';
 import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
 import { getCalendar, getDays } from '../lib/calendarService';
+import { calendarAllowsRiddles } from '../lib/calendarLock';
 import { publicCalendarTitleFontSize } from '../lib/calendarTitle';
 import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
@@ -47,6 +48,8 @@ export function PublicCalendarPage() {
     return framed(<div className="page public">Calendar not found.</div>);
   }
 
+  const riddlesEnabled = calendarAllowsRiddles(calendar);
+
   return framed(
     <div className="page public-calendar">
       <Snowfall />
@@ -61,9 +64,10 @@ export function PublicCalendarPage() {
             day={day}
             previewDate={previewDate}
             year={calendar.year}
+            riddlesEnabled={riddlesEnabled}
             onOpen={openDay}
             onLockedClick={(d) => {
-              if (hasDayRiddle(d)) {
+              if (riddlesEnabled && hasDayRiddle(d)) {
                 setRiddleDay(d);
               }
             }}
@@ -71,7 +75,7 @@ export function PublicCalendarPage() {
         ))}
       </div>
       <PublicCalendarFooter />
-      {riddleDay && (
+      {riddlesEnabled && riddleDay && (
         <RiddleModal
           prompt={riddleDay.riddlePrompt ?? ''}
           answerSalt={riddleDay.answerSalt}

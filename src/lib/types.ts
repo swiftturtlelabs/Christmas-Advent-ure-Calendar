@@ -10,7 +10,7 @@ export interface Calendar {
   ownerUid: string;
   title: string;
   year: number;
-  lockMode: 'date_riddle';
+  lockMode: 'date_only' | 'date_riddle';
   createdAt: string;
   updatedAt: string;
 }

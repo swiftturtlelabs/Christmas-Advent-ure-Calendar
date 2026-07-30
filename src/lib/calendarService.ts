@@ -204,3 +204,17 @@ export async function updateCalendarTitle(slug: string, ownerUid: string, title:
   if (!cal || cal.ownerUid !== ownerUid) throw new Error('Not authorized');
   await setDoc(doc(db, 'calendars', slug), { title, updatedAt: new Date().toISOString() }, { merge: true });
 }
+
+export async function updateCalendarSettings(
+  slug: string,
+  ownerUid: string,
+  settings: Pick<Calendar, 'lockMode'>,
+): Promise<void> {
+  const cal = await getCalendar(slug);
+  if (!cal || cal.ownerUid !== ownerUid) throw new Error('Not authorized');
+  await setDoc(
+    doc(db, 'calendars', slug),
+    { ...settings, updatedAt: new Date().toISOString() },
+    { merge: true },
+  );
+}

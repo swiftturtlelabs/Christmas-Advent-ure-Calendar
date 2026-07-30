@@ -4,6 +4,7 @@ import { PhoneFrame } from '../components/PhoneFrame';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
+import { calendarAllowsRiddles } from '../lib/calendarLock';
 import { isDayUnlocked } from '../lib/dateLock';
 import { hasDayRiddle } from '../lib/dayRiddle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
@@ -44,7 +45,12 @@ export function PublicDayPage() {
 
   const unlocked = isDayUnlocked(day.dayNumber, getAppNow(previewDate), calendar.year);
   const riddleUnlocked = (location.state as { riddleUnlocked?: boolean } | null)?.riddleUnlocked === true;
-  const canView = unlocked || riddleUnlocked || !hasDayRiddle(day);
+  const riddlesEnabled = calendarAllowsRiddles(calendar);
+  const canView =
+    unlocked ||
+    (riddlesEnabled && riddleUnlocked) ||
+    !riddlesEnabled ||
+    !hasDayRiddle(day);
   const calendarPath = withPreviewDate(`/c/${calendar.slug}`, previewDate);
 
   if (!canView) {
