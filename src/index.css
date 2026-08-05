@@ -499,7 +499,15 @@ main {
   margin: 0;
   flex: 1;
   min-height: 0;
-  aspect-ratio: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-frame__screen .public-day .tree-image {
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+  height: 100%;
 }
 
 .phone-frame__screen .public-day .day-card {
@@ -513,7 +521,7 @@ main {
 }
 
 .phone-frame__screen .day-overlay {
-  padding: 1.1rem 0.9rem 1.25rem;
+  padding: 1.25rem 1rem;
 }
 
 .phone-frame__screen .day-overlay h1 {
@@ -521,7 +529,7 @@ main {
 }
 
 .phone-frame__screen .day-message {
-  font-size: clamp(0.95rem, 4.5cqi, 1.15rem);
+  font-size: clamp(0.95rem, 4.5cqi, 1.2rem);
 }
 
 .phone-frame__screen .day-custom-image {
@@ -1504,147 +1512,28 @@ input[type='radio']:focus-visible {
 }
 
 .public-day .day-scene {
-  --scene-sky: #0e2e2a;
-  --scene-hill: #fefce0;
-  --scene-tree: #6dc0a5;
   max-width: 720px;
-  width: 100%;
   margin: 2rem auto;
   position: relative;
   overflow: hidden;
   z-index: 1;
   padding: 0;
-  aspect-ratio: 3 / 4;
-  min-height: 420px;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lift);
 }
 
-.day-scene__art {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-.day-scene__sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(245, 192, 76, 0.12), transparent 32%),
-    radial-gradient(circle at 82% 20%, rgba(109, 192, 165, 0.1), transparent 36%),
-    linear-gradient(180deg, #0a2420 0%, var(--scene-sky) 55%, #163f38 100%);
-}
-
-.day-scene__hill {
-  position: absolute;
-  left: -18%;
-  right: -18%;
-  bottom: -8%;
-  height: 38%;
-  background: var(--scene-hill);
-  border-radius: 50% 50% 0 0;
-  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.18);
-}
-
-.day-scene__tree-wrap {
-  position: absolute;
-  left: 50%;
-  bottom: 22%;
-  width: min(46%, 210px);
-  transform: translateX(-50%);
-  transform-origin: 50% 100%;
-  animation: day-tree-sway 5.5s ease-in-out infinite;
-}
-
-.day-scene__star {
-  display: block;
-  width: 22%;
-  margin: 0 auto -4%;
-  filter: drop-shadow(0 0 10px rgba(245, 166, 35, 0.55));
-  animation: day-star-twinkle 2.4s ease-in-out infinite;
-}
-
-.day-scene__tree {
-  display: block;
+.tree-image {
   width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.28));
-}
-
-.day-scene__gift {
-  position: absolute;
-  width: clamp(1.7rem, 9%, 2.75rem);
-  height: auto;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.22));
-  animation: day-gift-bob 3.2s ease-in-out infinite;
-}
-
-.day-scene__gift--1 {
-  left: 8%;
-  bottom: 14%;
-  width: clamp(2rem, 11%, 3.2rem);
-  animation-delay: 0s;
-}
-
-.day-scene__gift--2 {
-  left: 22%;
-  bottom: 10%;
-  width: clamp(1.5rem, 8%, 2.4rem);
-  animation-delay: 0.4s;
-}
-
-.day-scene__gift--3 {
-  left: 34%;
-  bottom: 16%;
-  width: clamp(1.8rem, 9.5%, 2.8rem);
-  animation-delay: 0.8s;
-}
-
-.day-scene__gift--4 {
-  right: 34%;
-  bottom: 15%;
-  width: clamp(1.6rem, 8.5%, 2.5rem);
-  animation-delay: 0.2s;
-}
-
-.day-scene__gift--5 {
-  right: 20%;
-  bottom: 11%;
-  width: clamp(2.1rem, 12%, 3.4rem);
-  animation-delay: 0.6s;
-}
-
-.day-scene__gift--6 {
-  right: 7%;
-  bottom: 17%;
-  width: clamp(1.5rem, 8%, 2.3rem);
-  animation-delay: 1s;
-}
-
-.day-scene__gift--7 {
-  left: 48%;
-  bottom: 9%;
-  width: clamp(1.4rem, 7.5%, 2.2rem);
-  transform: translateX(-50%);
-  animation-delay: 1.2s;
+  display: block;
+  border-radius: var(--radius-lg);
 }
 
 .day-overlay {
   position: absolute;
   inset: 0;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.5rem 1.25rem 1.35rem;
+  padding: 1.75rem;
   text-align: center;
-  pointer-events: none;
-}
-
-.day-overlay h1,
-.day-overlay__body {
-  pointer-events: auto;
 }
 
 .day-overlay h1 {
@@ -1655,22 +1544,11 @@ input[type='radio']:focus-visible {
   text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
 }
 
-.day-overlay__body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: auto;
-  padding: 0.85rem 0.75rem 0.35rem;
-  border-radius: var(--radius-md);
-  background: linear-gradient(180deg, transparent, rgba(8, 28, 24, 0.55) 28%, rgba(8, 28, 24, 0.72));
-}
-
 .day-message {
   font-family: var(--font-display);
   color: white;
-  font-size: clamp(1.05rem, 3.5vw, 1.55rem);
-  margin: 0;
+  font-size: clamp(1.05rem, 3.5vw, 1.6rem);
+  margin: auto 0 1rem;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
@@ -1679,38 +1557,6 @@ input[type='radio']:focus-visible {
   border-radius: var(--radius-md);
   margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-}
-
-@keyframes day-tree-sway {
-  0%,
-  100% {
-    transform: translateX(-50%) rotate(-1.2deg);
-  }
-  50% {
-    transform: translateX(-50%) rotate(1.4deg);
-  }
-}
-
-@keyframes day-star-twinkle {
-  0%,
-  100% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes day-gift-bob {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -4px;
-  }
 }
 
 .day-card {
