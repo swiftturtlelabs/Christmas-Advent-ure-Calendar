@@ -532,6 +532,12 @@ main {
   font-size: clamp(1.35rem, 7cqi, 1.85rem);
 }
 
+@media (min-width: 521px) {
+  .phone-frame__screen .day-countdown {
+    font-size: clamp(1.05rem, 5cqi, 1.35rem);
+  }
+}
+
 .phone-frame__screen .day-message-zone {
   bottom: 2%;
   width: 98%;
@@ -1587,7 +1593,7 @@ input[type='radio']:focus-visible {
   margin: 0;
   line-height: 1.15;
   text-align: center;
-  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   box-sizing: border-box;
 }
 
