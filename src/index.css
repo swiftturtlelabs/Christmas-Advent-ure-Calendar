@@ -524,20 +524,25 @@ main {
   flex-shrink: 0;
 }
 
-.phone-frame__screen .day-overlay {
-  padding: 1.25rem 1rem;
+.phone-frame__screen .day-overlay-top {
+  padding: 1rem 0.35rem 0;
 }
 
-.phone-frame__screen .day-overlay h1 {
+.phone-frame__screen .day-overlay-top h1 {
   font-size: clamp(1.35rem, 7cqi, 1.85rem);
 }
 
-.phone-frame__screen .day-message {
-  font-size: clamp(0.95rem, 4.5cqi, 1.2rem);
+.phone-frame__screen .day-message-zone {
+  left: 10%;
+  width: 62%;
+  height: 22%;
+  bottom: 2%;
 }
 
 .phone-frame__screen .day-custom-image {
-  max-width: min(160px, 45%);
+  max-width: min(120px, 30%);
+  right: 6%;
+  bottom: 3%;
 }
 
 label {
@@ -1533,18 +1538,23 @@ input[type='radio']:focus-visible {
 .day-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1.75rem;
+}
+
+.day-overlay-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88%;
+  padding: 1.25rem 0.5rem 0;
   text-align: center;
 }
 
-.day-overlay h1 {
+.day-overlay-top h1 {
   font-family: var(--font-display);
   color: var(--gold-400);
   font-size: clamp(1.6rem, 5vw, 2.6rem);
-  margin: 0;
+  margin: 0.35rem 0 0;
   text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
 }
 
@@ -1556,18 +1566,33 @@ input[type='radio']:focus-visible {
   text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
 }
 
+.day-message-zone {
+  position: absolute;
+  left: 12%;
+  bottom: 3%;
+  width: 58%;
+  height: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .day-message {
   font-family: var(--font-display);
   color: var(--holly-500);
-  font-size: clamp(1.05rem, 3.5vw, 1.6rem);
-  margin: auto 0 1rem;
+  width: 100%;
+  margin: 0;
+  line-height: 1.12;
+  text-align: center;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
 }
 
 .day-custom-image {
-  max-width: 200px;
+  position: absolute;
+  right: 8%;
+  bottom: 4%;
+  max-width: min(160px, 28%);
   border-radius: var(--radius-md);
-  margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 

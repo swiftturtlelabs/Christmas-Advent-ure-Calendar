@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { PhoneFrame } from '../components/PhoneFrame';
+import { FitText } from '../components/FitText';
 import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
@@ -78,9 +79,15 @@ export function PublicDayPage() {
           }}
         />
         <div className="day-overlay">
-          <p className="day-countdown">{countdownLabel}</p>
-          <h1>{day.title || `Day ${day.dayNumber}`}</h1>
-          <p className="day-message">{day.message || 'Your adventure awaits!'}</p>
+          <div className="day-overlay-top">
+            <p className="day-countdown">{countdownLabel}</p>
+            <h1>{day.title || `Day ${day.dayNumber}`}</h1>
+          </div>
+          <FitText
+            containerClassName="day-message-zone"
+            className="day-message"
+            text={day.message || 'Your adventure awaits!'}
+          />
           {day.imageUrl && <img className="day-custom-image" src={day.imageUrl} alt="" />}
         </div>
       </div>
