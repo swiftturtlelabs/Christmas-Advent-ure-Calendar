@@ -5,7 +5,7 @@ import { Snowfall } from '../components/Snowfall';
 import { getAppNow } from '../lib/appDate';
 import { getDayByToken } from '../lib/calendarService';
 import { calendarHasEarlyUnlock, calendarLocksFutureDates } from '../lib/calendarLock';
-import { isDayUnlocked } from '../lib/dateLock';
+import { christmasCountdownLabel, isDayUnlocked } from '../lib/dateLock';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
@@ -50,6 +50,7 @@ export function PublicDayPage() {
     unlocked ||
     (calendarHasEarlyUnlock(calendar) && earlyUnlocked);
   const calendarPath = withPreviewDate(`/c/${calendar.slug}`, previewDate);
+  const countdownLabel = christmasCountdownLabel(getAppNow(previewDate), calendar.year);
 
   if (!canView) {
     return framed(
@@ -77,6 +78,7 @@ export function PublicDayPage() {
           }}
         />
         <div className="day-overlay">
+          <p className="day-countdown">{countdownLabel}</p>
           <h1>{day.title || `Day ${day.dayNumber}`}</h1>
           <p className="day-message">{day.message || 'Your adventure awaits!'}</p>
           {day.imageUrl && <img className="day-custom-image" src={day.imageUrl} alt="" />}
