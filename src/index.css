@@ -533,9 +533,9 @@ main {
 }
 
 .phone-frame__screen .day-message-zone {
-  bottom: 13%;
-  width: 86%;
-  height: 13%;
+  bottom: 4%;
+  width: 90%;
+  height: 28%;
 }
 
 .phone-frame__screen .day-custom-image {
@@ -1568,26 +1568,27 @@ input[type='radio']:focus-visible {
 .day-message-zone {
   position: absolute;
   left: 50%;
-  bottom: 14%;
+  bottom: 5%;
   transform: translateX(-50%);
-  width: 84%;
-  height: 14%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 88%;
+  height: 26%;
+  display: grid;
+  align-content: center;
   overflow: hidden;
   box-sizing: border-box;
-  padding: 0 0.35rem;
+  padding: 0 0.5rem;
 }
 
 .day-message {
   font-family: var(--font-display);
   color: var(--holly-500);
   width: 100%;
+  max-width: 100%;
   margin: 0;
-  line-height: 1.12;
+  line-height: 1.15;
   text-align: center;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
 }
 
 .day-custom-image {

@@ -26,28 +26,24 @@ export function FitText({
     if (!container || !el) return;
 
     const fit = () => {
-      const maxWidth = container.clientWidth;
-      const maxHeight = container.clientHeight;
+      const styles = getComputedStyle(container);
+      const padX = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+      const padY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+      const maxWidth = container.clientWidth - padX;
+      const maxHeight = container.clientHeight - padY;
       if (maxWidth <= 0 || maxHeight <= 0) return;
 
-      // Leave a little breathing room so glyphs and shadows do not spill into the presents.
-      const widthLimit = maxWidth * 0.96;
-      const heightLimit = maxHeight * 0.9;
       el.style.width = `${maxWidth}px`;
+      el.style.maxWidth = `${maxWidth}px`;
 
-      let low = minFontSize;
-      let high = Math.min(maxFontSize, Math.floor(maxHeight * 0.95));
+      const upper = Math.min(maxFontSize, Math.floor(maxHeight * 1.1));
       let best = minFontSize;
 
-      while (low <= high) {
-        const mid = Math.floor((low + high) / 2);
-        el.style.fontSize = `${mid}px`;
-        const fits = el.scrollWidth <= widthLimit && el.scrollHeight <= heightLimit;
-        if (fits) {
-          best = mid;
-          low = mid + 1;
-        } else {
-          high = mid - 1;
+      for (let size = upper; size >= minFontSize; size--) {
+        el.style.fontSize = `${size}px`;
+        if (el.scrollHeight <= maxHeight && el.scrollWidth <= maxWidth + 1) {
+          best = size;
+          break;
         }
       }
 
