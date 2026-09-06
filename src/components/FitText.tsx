@@ -33,6 +33,10 @@ export function FitText({
       const maxHeight = container.clientHeight - padY;
       if (maxWidth <= 0 || maxHeight <= 0) return;
 
+      const widthLimit = maxWidth - 2;
+      const heightLimit = maxHeight - 6; // room for descenders (p, g, y)
+      if (widthLimit <= 0 || heightLimit <= 0) return;
+
       el.style.width = `${maxWidth}px`;
       el.style.maxWidth = `${maxWidth}px`;
 
@@ -41,7 +45,7 @@ export function FitText({
 
       for (let size = upper; size >= minFontSize; size--) {
         el.style.fontSize = `${size}px`;
-        if (el.scrollHeight <= maxHeight && el.scrollWidth <= maxWidth + 1) {
+        if (el.scrollHeight <= heightLimit && el.scrollWidth <= widthLimit + 1) {
           best = size;
           break;
         }
