@@ -533,8 +533,8 @@ main {
 }
 
 .phone-frame__screen .day-message-zone {
-  bottom: 7%;
-  width: 92%;
+  bottom: 3%;
+  width: 94%;
   height: 15%;
 }
 
@@ -1568,9 +1568,9 @@ input[type='radio']:focus-visible {
 .day-message-zone {
   position: absolute;
   left: 50%;
-  bottom: 8%;
+  bottom: 3%;
   transform: translateX(-50%);
-  width: 90%;
+  width: 94%;
   height: 16%;
   display: grid;
   align-content: center;
