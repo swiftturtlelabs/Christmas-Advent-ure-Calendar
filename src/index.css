@@ -533,10 +533,9 @@ main {
 }
 
 .phone-frame__screen .day-message-zone {
-  left: 10%;
-  width: 62%;
-  height: 22%;
-  bottom: 2%;
+  bottom: 13%;
+  width: 86%;
+  height: 13%;
 }
 
 .phone-frame__screen .day-custom-image {
@@ -1568,13 +1567,17 @@ input[type='radio']:focus-visible {
 
 .day-message-zone {
   position: absolute;
-  left: 12%;
-  bottom: 3%;
-  width: 58%;
-  height: 20%;
+  left: 50%;
+  bottom: 14%;
+  transform: translateX(-50%);
+  width: 84%;
+  height: 14%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 0 0.35rem;
 }
 
 .day-message {

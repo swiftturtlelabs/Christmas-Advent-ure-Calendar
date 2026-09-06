@@ -30,16 +30,19 @@ export function FitText({
       const maxHeight = container.clientHeight;
       if (maxWidth <= 0 || maxHeight <= 0) return;
 
+      // Leave a little breathing room so glyphs and shadows do not spill into the presents.
+      const widthLimit = maxWidth * 0.96;
+      const heightLimit = maxHeight * 0.9;
       el.style.width = `${maxWidth}px`;
 
       let low = minFontSize;
-      let high = maxFontSize;
+      let high = Math.min(maxFontSize, Math.floor(maxHeight * 0.95));
       let best = minFontSize;
 
       while (low <= high) {
         const mid = Math.floor((low + high) / 2);
         el.style.fontSize = `${mid}px`;
-        const fits = el.scrollWidth <= maxWidth && el.scrollHeight <= maxHeight;
+        const fits = el.scrollWidth <= widthLimit && el.scrollHeight <= heightLimit;
         if (fits) {
           best = mid;
           low = mid + 1;
