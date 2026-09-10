@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CALENDAR_TITLE_LONG_WARNING_AT,
+  calendarShowsYear,
   isCalendarTitleLong,
   publicCalendarTitleFontSize,
 } from './calendarTitle';
@@ -22,7 +23,19 @@ describe('calendarTitle', () => {
   it('keeps sizes within a readable range', () => {
     const tiny = Number.parseFloat(publicCalendarTitleFontSize('Hi'));
     const huge = Number.parseFloat(publicCalendarTitleFontSize('x'.repeat(80)));
-    expect(tiny).toBeLessThanOrEqual(2.45);
-    expect(huge).toBeGreaterThanOrEqual(1.12);
+    expect(tiny).toBeLessThanOrEqual(3.35);
+    expect(huge).toBeGreaterThanOrEqual(1.35);
+  });
+
+  it('uses smaller title sizes when the year is shown', () => {
+    const titleOnly = Number.parseFloat(publicCalendarTitleFontSize('Ada'));
+    const withYear = Number.parseFloat(publicCalendarTitleFontSize('Ada', true));
+    expect(titleOnly).toBeGreaterThan(withYear);
+  });
+
+  it('treats showYear as opt-in', () => {
+    expect(calendarShowsYear({})).toBe(false);
+    expect(calendarShowsYear({ showYear: false })).toBe(false);
+    expect(calendarShowsYear({ showYear: true })).toBe(true);
   });
 });

@@ -226,5 +226,13 @@ export async function updateCalendarSettings(
     );
   }
 
+  if (patch.showYear !== undefined) {
+    if (patch.showYear) {
+      updated.showYear = true;
+    } else {
+      updated.showYear = deleteField();
+    }
+  }
+
   await setDoc(doc(db, 'calendars', slug), updated, { merge: true });
 }

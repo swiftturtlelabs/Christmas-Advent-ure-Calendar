@@ -1084,7 +1084,7 @@ input[type='radio']:focus-visible {
 .public-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.75rem;
   position: relative;
   z-index: 1;
@@ -1093,6 +1093,10 @@ input[type='radio']:focus-visible {
   padding: 0.85rem 1.1rem;
   /* Yellow banner — reserved for future theme options */
   /* background: rgba(245, 192, 76, 0.42); */
+}
+
+.public-header--with-year {
+  justify-content: space-between;
 }
 
 .page.public-calendar {
@@ -1111,12 +1115,12 @@ input[type='radio']:focus-visible {
 
 .public-header h1 {
   color: var(--holly-500);
-  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  font-size: clamp(2.75rem, 8vw, 4.25rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.05;
   margin: 0;
-  text-align: left;
+  text-align: center;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1126,6 +1130,11 @@ input[type='radio']:focus-visible {
     0 1px 0 rgba(6, 37, 28, 0.55),
     0 2px 3px rgba(0, 0, 0, 0.4),
     0 4px 12px rgba(6, 37, 28, 0.45);
+}
+
+.public-header--with-year h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+  text-align: left;
 }
 
 .public-header-year {

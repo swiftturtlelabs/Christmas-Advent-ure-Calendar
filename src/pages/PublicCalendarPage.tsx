@@ -7,7 +7,7 @@ import { RiddleModal } from '../components/RiddleModal';
 import { Snowfall } from '../components/Snowfall';
 import { getCalendar, getDays } from '../lib/calendarService';
 import { calendarHasEarlyUnlock, calendarLocksFutureDates } from '../lib/calendarLock';
-import { publicCalendarTitleFontSize } from '../lib/calendarTitle';
+import { calendarShowsYear, publicCalendarTitleFontSize } from '../lib/calendarTitle';
 import { parsePreviewDate, withPreviewDate } from '../lib/previewDate';
 import type { Calendar, DayContent } from '../lib/types';
 
@@ -49,13 +49,14 @@ export function PublicCalendarPage() {
 
   const lockFutureDates = calendarLocksFutureDates(calendar);
   const earlyUnlockEnabled = calendarHasEarlyUnlock(calendar);
+  const showYear = calendarShowsYear(calendar);
 
   return framed(
     <div className="page public-calendar">
       <Snowfall />
-      <header className="public-header">
-        <h1 style={{ fontSize: publicCalendarTitleFontSize(calendar.title) }}>{calendar.title}</h1>
-        <p className="public-header-year">{calendar.year}</p>
+      <header className={`public-header${showYear ? ' public-header--with-year' : ''}`}>
+        <h1 style={{ fontSize: publicCalendarTitleFontSize(calendar.title, showYear) }}>{calendar.title}</h1>
+        {showYear && <p className="public-header-year">{calendar.year}</p>}
       </header>
       <div className="public-day-grid">
         {days.map((day) => (

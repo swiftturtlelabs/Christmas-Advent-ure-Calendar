@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { InfoTooltip } from './InfoTooltip';
 import { calendarLocksFutureDates } from '../lib/calendarLock';
+import { calendarShowsYear } from '../lib/calendarTitle';
 import type { CalendarSettingsPatch } from '../lib/types';
 import type { Calendar } from '../lib/types';
 
@@ -18,6 +19,7 @@ export function CalendarSettingsModal({
   onClose,
 }: CalendarSettingsModalProps) {
   const [lockFutureDates, setLockFutureDates] = useState(calendarLocksFutureDates(calendar));
+  const [showYear, setShowYear] = useState(calendarShowsYear(calendar));
   const [unlockPrompt, setUnlockPrompt] = useState(calendar.unlockPrompt ?? '');
   const [unlockCode, setUnlockCode] = useState(initialUnlockCode);
   const [saving, setSaving] = useState(false);
@@ -35,6 +37,7 @@ export function CalendarSettingsModal({
     try {
       await onSave({
         lockMode: lockFutureDates ? 'date_locked' : 'open',
+        showYear,
         unlockPrompt,
         unlockAnswer: unlockCode.trim() || undefined,
       });
@@ -60,6 +63,20 @@ export function CalendarSettingsModal({
         <p className="muted calendar-settings-intro">
           These settings apply to <strong>{calendar.title}</strong> and every day in the calendar.
         </p>
+
+        <section className="calendar-settings-section" aria-labelledby="calendar-settings-display-heading">
+          <h3 id="calendar-settings-display-heading" className="calendar-settings-section-title">
+            Display
+          </h3>
+
+          <label className="calendar-settings-toggle">
+            <input type="checkbox" checked={showYear} onChange={(e) => setShowYear(e.target.checked)} />
+            <span>
+              <strong>Show year</strong>
+              <span className="muted">Display the calendar year next to the title on the public page.</span>
+            </span>
+          </label>
+        </section>
 
         <section className="calendar-settings-section" aria-labelledby="calendar-settings-lock-heading">
           <h3 id="calendar-settings-lock-heading" className="calendar-settings-section-title">

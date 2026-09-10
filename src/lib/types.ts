@@ -10,6 +10,8 @@ export interface Calendar {
   ownerUid: string;
   title: string;
   year: number;
+  /** When true, show the calendar year beside the title on the public page. */
+  showYear?: boolean;
   lockMode: 'open' | 'date_locked';
   unlockPrompt?: string;
   unlockAnswerHash?: string;
@@ -59,6 +61,7 @@ export interface CalendarAdminConfig {
 
 export interface CalendarSettingsPatch {
   lockMode: Calendar['lockMode'];
+  showYear?: boolean;
   unlockPrompt?: string;
   unlockAnswer?: string;
 }
