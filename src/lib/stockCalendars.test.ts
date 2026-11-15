@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STOCK_CALENDARS, STOCK_CALENDARS_LABEL } from './stockCalendars';
+import { isStockCalendarSlug, STOCK_CALENDARS, STOCK_CALENDARS_LABEL } from './stockCalendars';
 
 describe('stockCalendars', () => {
   it('lists five sample calendars with unique slugs', () => {
@@ -11,5 +11,10 @@ describe('stockCalendars', () => {
 
   it('exposes the Swift Turtle catalog label', () => {
     expect(STOCK_CALENDARS_LABEL).toContain('Swift Turtle');
+  });
+
+  it('recognizes stock calendar slugs for public QR export', () => {
+    expect(isStockCalendarSlug(STOCK_CALENDARS[0].slug)).toBe(true);
+    expect(isStockCalendarSlug('not-a-stock-slug')).toBe(false);
   });
 });

@@ -1602,6 +1602,20 @@ input[type='radio']:focus-visible {
   margin-bottom: 1.75rem;
 }
 
+.stock-calendars .card h1,
+.stock-calendars .card h2 {
+  color: var(--pine-900);
+  text-shadow: none;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
+
+.stock-calendars-hero h1 {
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  line-height: 1.2;
+}
+
 .stock-calendars-intro {
   margin-bottom: 1rem;
   line-height: 1.55;

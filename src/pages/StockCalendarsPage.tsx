@@ -49,6 +49,9 @@ export function StockCalendarsPage() {
               <Link className="btn primary" to={`/c/${cal.slug}`}>
                 Open calendar
               </Link>
+              <Link className="btn secondary" to={`/samples/${cal.slug}/qr`}>
+                Print QR codes
+              </Link>
             </div>
           </li>
         ))}

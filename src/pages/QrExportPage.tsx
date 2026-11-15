@@ -1,10 +1,15 @@
 import JSZip from 'jszip';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { getCalendar, getDays } from '../lib/calendarService';
+import { isStockCalendarSlug } from '../lib/stockCalendars';
 import { buildCalendarUrl, buildDayUrl } from '../lib/tokens';
 import type { Calendar, DayContent } from '../lib/types';
+
+interface QrExportPageProps {
+  sampleMode?: boolean;
+}
 
 interface QrItem {
   label: string;
@@ -24,7 +29,7 @@ function dataUrlToBlob(dataUrl: string) {
   return new Blob([bytes], { type: 'image/png' });
 }
 
-export function QrExportPage() {
+export function QrExportPage({ sampleMode = false }: QrExportPageProps) {
   const { slug } = useParams<{ slug: string }>();
   const [calendar, setCalendar] = useState<Calendar | null>(null);
   const [items, setItems] = useState<QrItem[]>([]);
@@ -33,6 +38,7 @@ export function QrExportPage() {
 
   useEffect(() => {
     if (!slug) return;
+    if (sampleMode && !isStockCalendarSlug(slug)) return;
     (async () => {
       const [cal, days] = await Promise.all([getCalendar(slug), getDays(slug)]);
       setCalendar(cal);
@@ -53,7 +59,7 @@ export function QrExportPage() {
       setItems(generated);
       setLoading(false);
     })();
-  }, [slug]);
+  }, [slug, sampleMode]);
 
   const download = (item: QrItem) => {
     const a = document.createElement('a');
@@ -86,14 +92,25 @@ export function QrExportPage() {
     window.print();
   };
 
-  if (loading || !calendar) {
+  if (sampleMode && slug && !isStockCalendarSlug(slug)) {
+    return <Navigate to="/samples" replace />;
+  }
+
+  if (loading) {
     return <div className="page loading">Generating QR codes…</div>;
   }
 
+  if (!calendar) {
+    return <Navigate to={sampleMode ? '/samples' : '/app'} replace />;
+  }
+
+  const backTo = sampleMode ? '/samples' : `/app/c/${slug}/edit`;
+  const backLabel = sampleMode ? '← Sample calendars' : '← Back to editor';
+
   return (
-    <div className="page qr-export">
+    <div className={`page qr-export${sampleMode ? ' qr-export-sample' : ''}`}>
       <div className="editor-header">
-        <Link to={`/app/c/${slug}/edit`}>← Back to editor</Link>
+        <Link to={backTo}>{backLabel}</Link>
         <h1>QR codes — {calendar.title}</h1>
         <div className="editor-header-actions print-hide">
           <button

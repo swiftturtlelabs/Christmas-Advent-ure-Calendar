@@ -20,6 +20,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<LandingPage />} />
             <Route path="samples" element={<StockCalendarsPage />} />
+            <Route path="samples/:slug/qr" element={<QrExportPage sampleMode />} />
             <Route element={<ProtectedRoute />}>
               <Route path="app" element={<DashboardPage />} />
               <Route path="app/account" element={<AccountSettingsPage />} />

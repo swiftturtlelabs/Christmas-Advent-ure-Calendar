@@ -46,3 +46,7 @@ export const STOCK_CALENDARS: StockCalendar[] = [
     tone: 'Adventure',
   },
 ];
+
+export function isStockCalendarSlug(slug: string): boolean {
+  return STOCK_CALENDARS.some((cal) => cal.slug === slug);
+}
