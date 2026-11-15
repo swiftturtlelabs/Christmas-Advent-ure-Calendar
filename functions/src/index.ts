@@ -131,11 +131,22 @@ app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
     res.status(err.status).json({ error: err.message });
     return;
   }
-  next(err);
+  console.error(err);
+  const message = err instanceof Error ? err.message : 'Internal server error';
+  res.status(500).json({ error: message });
+  next();
 });
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
-export const api = onRequest({ region: 'us-central1', cors: true, invoker: 'public' }, app);
+export const api = onRequest(
+  {
+    region: 'us-central1',
+    cors: true,
+    invoker: 'public',
+    serviceAccount: 'firebase-adminsdk-fbsvc@christmas-advent-ure-calendar.iam.gserviceaccount.com',
+  },
+  app,
+);
