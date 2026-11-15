@@ -3,6 +3,9 @@ export interface UserProfile {
   displayName: string;
   email: string;
   createdAt: string;
+  apiKeyHash?: string;
+  apiKeyPrefix?: string;
+  apiKeyCreatedAt?: string;
 }
 
 export interface Calendar {

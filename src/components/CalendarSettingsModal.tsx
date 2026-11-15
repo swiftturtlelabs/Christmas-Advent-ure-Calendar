@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { InfoTooltip } from './InfoTooltip';
 import { calendarLocksFutureDates } from '../lib/calendarLock';
 import { calendarShowsYear } from '../lib/calendarTitle';
+import { DONATE_LABEL, DONATE_URL } from '../lib/donate';
 import type { CalendarSettingsPatch } from '../lib/types';
 import type { Calendar } from '../lib/types';
 
@@ -137,6 +138,13 @@ export function CalendarSettingsModal({
             {saving ? 'Saving…' : 'Save settings'}
           </button>
         </div>
+
+        <p className="muted calendar-settings-support">
+          This app is free.{' '}
+          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer">
+            {DONATE_LABEL}
+          </a>
+        </p>
       </div>
     </div>
   );

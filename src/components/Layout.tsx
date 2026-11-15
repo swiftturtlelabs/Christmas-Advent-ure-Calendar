@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { DONATE_LABEL, DONATE_URL } from '../lib/donate';
 
 export function Layout() {
   const { user, signIn, signOut } = useAuth();
@@ -20,6 +21,7 @@ export function Layout() {
           {user ? (
             <>
               <Link to="/app">My Calendars</Link>
+              <Link to="/app/account">Account</Link>
               <button type="button" className="btn linkish" onClick={() => signOut()}>
                 Sign out
               </button>
@@ -34,6 +36,11 @@ export function Layout() {
       <main>
         <Outlet />
       </main>
+      <footer className="site-footer">
+        <a href={DONATE_URL} target="_blank" rel="noopener noreferrer">
+          {DONATE_LABEL}
+        </a>
+      </footer>
     </div>
   );
 }

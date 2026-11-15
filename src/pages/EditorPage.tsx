@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CalendarDays, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, FileUp, Settings } from 'lucide-react';
 import {
   getCalendar,
   getCalendarAdminConfig,
   getDays,
+  importDayRows,
   saveDay,
   updateCalendarSettings,
   updateCalendarTitle,
 } from '../lib/calendarService';
+import { buildCsvImportPreview } from '../lib/csvImport';
 import {
   applyStockAdventure,
   collectUsedStockIds,
@@ -16,6 +18,7 @@ import {
   STOCK_ADVENTURES,
 } from '../lib/stockAdventures';
 import { CalendarSettingsModal } from '../components/CalendarSettingsModal';
+import { CsvImportModal } from '../components/CsvImportModal';
 import { PreviewDateModal } from '../components/PreviewDateModal';
 import { SuggestionsModal } from '../components/SuggestionsModal';
 import { isDaySetup } from '../lib/calendarProgress';
@@ -69,6 +72,8 @@ export function EditorPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showCalendarSettings, setShowCalendarSettings] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
+  const [csvImporting, setCsvImporting] = useState(false);
   const [adminUnlockCode, setAdminUnlockCode] = useState('');
 
   useEffect(() => {
@@ -273,6 +278,45 @@ export function EditorPage() {
     setMessage('Calendar settings saved.');
   };
 
+  const handleCsvImport = async (rows: import('../lib/csvImport').CsvDayRow[]) => {
+    if (!user) return;
+    const toApply = buildCsvImportPreview(rows, days).filter((row) => row.willChange);
+    if (toApply.length === 0) return;
+
+    setCsvImporting(true);
+    setMessage('');
+    setSaveFailed(false);
+    try {
+      await importDayRows(
+        slug,
+        user.uid,
+        toApply.map((row) => ({
+          dayNumber: row.dayNumber,
+          title: row.title,
+          message: row.message,
+        })),
+      );
+      const refreshed = await getDays(slug);
+      setDays(refreshed);
+      const appliedDay = toApply.some((row) => row.dayNumber === selectedDay)
+        ? selectedDay
+        : toApply[0].dayNumber;
+      const nextDay = refreshed.find((d) => d.dayNumber === appliedDay);
+      if (nextDay) {
+        setSelectedDay(appliedDay);
+        setDraft(draftFromDay(nextDay));
+      }
+      setShowCsvImport(false);
+      setMessage(`Imported ${toApply.length} ${toApply.length === 1 ? 'day' : 'days'}.`);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : 'Unknown error';
+      setSaveFailed(true);
+      setMessage(`Could not import CSV: ${detail}`);
+    } finally {
+      setCsvImporting(false);
+    }
+  };
+
   const openCalendarSettings = async () => {
     if (!user) return;
     try {
@@ -294,6 +338,10 @@ export function EditorPage() {
         </Link>
         <h1>Edit calendar</h1>
         <div className="editor-header-actions">
+          <button type="button" className="btn secondary" onClick={() => setShowCsvImport(true)}>
+            <FileUp size={16} strokeWidth={2.2} aria-hidden="true" />
+            Import CSV
+          </button>
           <button
             type="button"
             className="btn secondary"
@@ -557,6 +605,15 @@ export function EditorPage() {
           initialUnlockCode={adminUnlockCode}
           onSave={handleCalendarSettingsSave}
           onClose={() => setShowCalendarSettings(false)}
+        />
+      )}
+
+      {showCsvImport && (
+        <CsvImportModal
+          days={days}
+          applying={csvImporting}
+          onApply={handleCsvImport}
+          onClose={() => !csvImporting && setShowCsvImport(false)}
         />
       )}
     </div>

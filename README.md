@@ -10,11 +10,13 @@ A Firebase-hosted web app for creating and sharing personalized 24-day Christmas
 - Public calendar page with date-based soft-lock + riddle bypass
 - Stable per-day and main-calendar URLs for QR code export
 - Responsive Christmas-themed UI with snowfall
+- CSV import for bulk day setup (from Google Sheets export)
+- REST API with per-user API keys for AI-assisted calendar setup
 
 ## Stack
 
 - React + Vite + TypeScript
-- Firebase Auth, Firestore, Hosting
+- Firebase Auth, Firestore, Hosting, Cloud Functions
 - Vitest + React Testing Library
 
 ## Setup
@@ -53,8 +55,13 @@ npm run build
 
 ```bash
 npm run build
-npx firebase deploy --only hosting,firestore:rules
+cd functions && npm install && npm run build && cd ..
+npx firebase deploy --only hosting,firestore:rules,functions
 ```
+
+## API
+
+See [docs/API.md](docs/API.md) for authentication, endpoints, and an example prompt for AI tools. In the app: **Account** → generate API key, **API documentation** for a quick reference.
 
 ## Project structure
 

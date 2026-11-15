@@ -158,6 +158,19 @@ export async function saveDay(
   }
 }
 
+export async function importDayRows(
+  slug: string,
+  ownerUid: string,
+  rows: { dayNumber: number; title: string; message: string }[],
+): Promise<void> {
+  for (const row of rows) {
+    await saveDay(slug, ownerUid, row.dayNumber, {
+      title: row.title,
+      message: row.message,
+    });
+  }
+}
+
 export async function seedStockAdventuresIfEmpty(): Promise<void> {
   const col = collection(db, 'stockAdventures');
   const snap = await getDocs(col);

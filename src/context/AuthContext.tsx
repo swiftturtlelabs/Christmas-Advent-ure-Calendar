@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   getRedirectResult,
   onAuthStateChanged,
@@ -22,6 +22,7 @@ interface AuthContextValue {
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
   clearAuthError: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -75,6 +76,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) {
+      setProfile(null);
+      return;
+    }
+    try {
+      const p = await ensureUserProfile(user);
+      setProfile(p);
+    } catch (error) {
+      setAuthError(getAuthErrorMessage(error));
+    }
+  }, [user]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -84,6 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authError,
       configError: firebaseConfigError,
       clearAuthError: () => setAuthError(null),
+      refreshProfile,
       signIn: async () => {
         if (firebaseConfigError) {
           setAuthError(firebaseConfigError);
@@ -116,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await firebaseSignOut(auth);
       },
     }),
-    [user, profile, loading, signingIn, authError],
+    [user, profile, loading, signingIn, authError, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
