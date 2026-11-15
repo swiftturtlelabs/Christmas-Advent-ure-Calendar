@@ -1665,7 +1665,36 @@ input[type='radio']:focus-visible {
   margin-top: 1.75rem;
   text-align: center;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+.stock-calendars-footer-note p {
+  margin: 0;
+  color: var(--ink-600);
+}
+
+.stock-calendars-footer-note a {
+  color: var(--pine-800);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.stock-calendars-footer-note a:hover {
+  color: var(--holly-700);
+}
+
+.stock-calendars .card .muted {
+  color: var(--ink-600);
+}
+
+.stock-calendars a:not(.btn):not(.brand) {
+  color: var(--pine-800);
+  font-weight: 600;
+}
+
+.stock-calendars a:not(.btn):not(.brand):hover {
+  color: var(--holly-700);
 }
 
 .landing-samples {

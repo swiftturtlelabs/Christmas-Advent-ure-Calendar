@@ -54,17 +54,19 @@ export function StockCalendarsPage() {
         ))}
       </ul>
 
-      <p className="muted stock-calendars-footer-note">
-        These calendars are shared as examples. Sign in to create a private calendar with your own title,
-        days, and lock settings
-        {user ? (
-          <>
-            —or start from scratch on <Link to="/app">My Calendars</Link>.
-          </>
-        ) : (
-          <>.</>
-        )}
-      </p>
+      <div className="card stock-calendars-footer-note">
+        <p>
+          These calendars are shared as examples. Sign in to create a private calendar with your own title,
+          days, and lock settings
+          {user ? (
+            <>
+              —or start from scratch on <Link to="/app">My Calendars</Link>.
+            </>
+          ) : (
+            <>.</>
+          )}
+        </p>
+      </div>
     </div>
   );
 }
