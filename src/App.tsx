@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { ApiDocsPage } from './pages/ApiDocsPage';
+import { DonatePage } from './pages/DonatePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditorPage } from './pages/EditorPage';
 import { LandingPage } from './pages/LandingPage';
@@ -19,6 +20,7 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<LandingPage />} />
+            <Route path="donate" element={<DonatePage />} />
             <Route path="samples" element={<StockCalendarsPage />} />
             <Route path="samples/:slug/qr" element={<QrExportPage sampleMode />} />
             <Route element={<ProtectedRoute />}>

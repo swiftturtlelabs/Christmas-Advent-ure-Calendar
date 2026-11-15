@@ -1,6 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { DONATE_LABEL, DONATE_URL } from '../lib/donate';
+import { DONATE_LABEL, DONATE_PAGE_PATH } from '../lib/donate';
 
 export function Layout() {
   const { user, signIn, signOut } = useAuth();
@@ -38,9 +38,7 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className="site-footer">
-        <a href={DONATE_URL} target="_blank" rel="noopener noreferrer">
-          {DONATE_LABEL}
-        </a>
+        <Link to={DONATE_PAGE_PATH}>{DONATE_LABEL}</Link>
       </footer>
     </div>
   );
