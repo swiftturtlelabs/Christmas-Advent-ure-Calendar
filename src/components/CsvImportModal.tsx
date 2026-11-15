@@ -88,15 +88,22 @@ export function CsvImportModal({ days, applying, onApply, onClose }: CsvImportMo
             <ul className="csv-import-preview-list">
               {preview.map((row) => (
                 <li key={row.dayNumber} className={row.willChange ? 'will-change' : 'no-change'}>
-                  <strong>Day {row.dayNumber}</strong>
-                  {row.willChange ? (
-                    <>
-                      {' — '}
-                      <span className="csv-import-new">{row.title || '(no title)'}</span>
-                    </>
-                  ) : (
-                    <span className="muted"> — no change</span>
-                  )}
+                  <div className="csv-import-preview-day">
+                    <strong>Day {row.dayNumber}</strong>
+                    {!row.willChange && <span className="muted csv-import-preview-badge">No change</span>}
+                  </div>
+                  <p className="csv-import-preview-field">
+                    <span className="csv-import-preview-label">Title</span>
+                    {row.title.trim() || <span className="muted">(empty)</span>}
+                  </p>
+                  <p className="csv-import-preview-field csv-import-preview-message">
+                    <span className="csv-import-preview-label">Message</span>
+                    {row.message.trim() ? (
+                      row.message.trim()
+                    ) : (
+                      <span className="muted">(empty)</span>
+                    )}
+                  </p>
                 </li>
               ))}
             </ul>

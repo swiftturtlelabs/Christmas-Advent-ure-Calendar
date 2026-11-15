@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Snowfall } from '../components/Snowfall';
 
@@ -42,9 +42,14 @@ export function LandingPage() {
         {loading || signingIn || user ? (
           <p>{signingIn ? 'Signing in…' : user ? 'Taking you to your calendars…' : 'Loading…'}</p>
         ) : (
-          <button type="button" className="btn primary" onClick={handleSignIn}>
-            Sign in with Google
-          </button>
+          <>
+            <button type="button" className="btn primary" onClick={handleSignIn}>
+              Sign in with Google
+            </button>
+            <p className="landing-samples">
+              <Link to="/samples">Browse Swift Turtle sample calendars</Link>
+            </p>
+          </>
         )}
       </div>
     </div>

@@ -18,6 +18,7 @@ export function Layout() {
           Christmas Advent-ure Calendar
         </Link>
         <nav>
+          <Link to="/samples">Sample calendars</Link>
           {user ? (
             <>
               <Link to="/app">My Calendars</Link>

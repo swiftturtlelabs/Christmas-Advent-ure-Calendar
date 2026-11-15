@@ -10,6 +10,7 @@ import { LandingPage } from './pages/LandingPage';
 import { PublicCalendarPage } from './pages/PublicCalendarPage';
 import { PublicDayPage } from './pages/PublicDayPage';
 import { QrExportPage } from './pages/QrExportPage';
+import { StockCalendarsPage } from './pages/StockCalendarsPage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<LandingPage />} />
+            <Route path="samples" element={<StockCalendarsPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="app" element={<DashboardPage />} />
               <Route path="app/account" element={<AccountSettingsPage />} />
