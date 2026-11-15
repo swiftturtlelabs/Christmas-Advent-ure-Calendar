@@ -5,8 +5,7 @@ export const DONATE_BLURB =
 
 export const DONATE_PAYPAL_URL = 'https://paypal.me/Kengeph';
 
-/** Public payment profile — same handle as PayPal.me/Kengeph */
-export const DONATE_VENMO_URL = 'https://account.venmo.com/u/Kengeph';
+export const DONATE_VENMO_URL = 'https://account.venmo.com/u/Kenny-Anderson-1';
 
 export const DONATE_CASH_APP_URL = 'https://cash.app/$Kengeph';
 
@@ -23,7 +22,7 @@ export const DONATE_METHODS = [
     name: 'Venmo',
     description: 'Easy if you already use Venmo.',
     url: DONATE_VENMO_URL,
-    cta: '@Kengeph',
+    cta: '@Kenny-Anderson-1',
   },
   {
     id: 'cashapp',
