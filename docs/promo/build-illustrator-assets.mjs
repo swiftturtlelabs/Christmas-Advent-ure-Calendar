@@ -74,7 +74,7 @@ function runChrome(args) {
 }
 
 function screenshotHtml(html, outPng, cssW, cssH, scale = 1) {
-  const htmlPath = path.join(tmpDir, `${path.basename(outPng, '.png')}.html`);
+  const htmlPath = path.join(tmpDir, `${path.basename(outPng, '.png')}-${Date.now()}-${Math.random().toString(16).slice(2)}.html`);
   fs.writeFileSync(htmlPath, html, 'utf8');
   runChrome([
     '--headless=new',
@@ -84,31 +84,70 @@ function screenshotHtml(html, outPng, cssW, cssH, scale = 1) {
     `--force-device-scale-factor=${scale}`,
     '--default-background-color=00000000',
     '--hide-scrollbars',
+    '--virtual-time-budget=2000',
     pathToFileURL(htmlPath).href,
   ]);
+}
+
+/**
+ * Clean transparent PNG without pink/magenta fringe:
+ * render the same HTML on black and on white, then recover alpha + color.
+ */
+function renderTransparentFromParts({ style, body }, outPng, cssW, cssH, scale = 1) {
+  const stem = path.basename(outPng, '.png');
+  const blackPath = path.join(tmpDir, `${stem}-black.png`);
+  const whitePath = path.join(tmpDir, `${stem}-white.png`);
+
+  const page = (bg) => `<!doctype html><html><head><style>
+${fontFaces}
+html,body{margin:0;width:${cssW}px;height:${cssH}px;overflow:hidden;background:${bg}}
+${style}
+</style></head><body>${body}</body></html>`;
+
+  screenshotHtml(page('#000000'), blackPath, cssW, cssH, scale);
+  screenshotHtml(page('#ffffff'), whitePath, cssW, cssH, scale);
+
+  const black = PNG.sync.read(fs.readFileSync(blackPath));
+  const white = PNG.sync.read(fs.readFileSync(whitePath));
+  if (black.width !== white.width || black.height !== white.height) {
+    throw new Error(`Size mismatch for ${stem}`);
+  }
+
+  const out = new PNG({ width: black.width, height: black.height });
+  for (let i = 0; i < black.data.length; i += 4) {
+    // On black: Cb = F * a
+    // On white: Cw = F * a + 255 * (1-a)
+    // => Cw - Cb = 255 * (1-a)  (per channel; use average)
+    const dr = white.data[i] - black.data[i];
+    const dg = white.data[i + 1] - black.data[i + 1];
+    const db = white.data[i + 2] - black.data[i + 2];
+    const diff = (dr + dg + db) / 3;
+    let a = 1 - diff / 255;
+    if (a < 0.02) a = 0;
+    if (a > 0.98) a = 1;
+    a = Math.min(1, Math.max(0, a));
+
+    if (a < 0.02) {
+      out.data[i] = 0;
+      out.data[i + 1] = 0;
+      out.data[i + 2] = 0;
+      out.data[i + 3] = 0;
+      continue;
+    }
+
+    // Recover straight (unassociated) color from black plate: F = Cb / a
+    const r = Math.min(255, Math.max(0, Math.round(black.data[i] / a)));
+    const g = Math.min(255, Math.max(0, Math.round(black.data[i + 1] / a)));
+    const b = Math.min(255, Math.max(0, Math.round(black.data[i + 2] / a)));
+    out.data[i] = r;
+    out.data[i + 1] = g;
+    out.data[i + 2] = b;
+    out.data[i + 3] = Math.round(a * 255);
+  }
+
+  fs.writeFileSync(outPng, PNG.sync.write(out));
   console.log('✓', path.basename(outPng));
 }
-
-/** Chrome often composites "transparent" to black — render on chroma, then punch to alpha. */
-function chromaToAlpha(file, chroma = [255, 0, 255], threshold = 40) {
-  const png = PNG.sync.read(fs.readFileSync(file));
-  const [cr, cg, cb] = chroma;
-  for (let i = 0; i < png.data.length; i += 4) {
-    const dr = Math.abs(png.data[i] - cr);
-    const dg = Math.abs(png.data[i + 1] - cg);
-    const db = Math.abs(png.data[i + 2] - cb);
-    if (dr <= threshold && dg <= threshold && db <= threshold) {
-      png.data[i] = 0;
-      png.data[i + 1] = 0;
-      png.data[i + 2] = 0;
-      png.data[i + 3] = 0;
-    }
-  }
-  fs.writeFileSync(file, PNG.sync.write(png));
-}
-
-const CHROMA = '#ff00ff';
-const CHROMA_RGB = [255, 0, 255];
 
 function writePng(file, width, height, paint) {
   const png = new PNG({ width, height });
@@ -176,6 +215,7 @@ console.log('✓ 01-qr.png');
   const cssW = Math.round(3.75 * 96);
   const cssH = Math.round(2.25 * 96);
   const scale = 300 / 96; // → 300 DPI
+  const gradOut = path.join(outDir, '03-gradient-background.png');
   screenshotHtml(
     `<!doctype html><html><head><style>
       html,body{margin:0;width:${cssW}px;height:${cssH}px;overflow:hidden}
@@ -185,11 +225,12 @@ console.log('✓ 01-qr.png');
         linear-gradient(165deg, ${COLORS.snow} 0%, ${COLORS.snow100} 55%, ${COLORS.cream} 100%);
       }
     </style></head><body><div class="bg"></div></body></html>`,
-    path.join(outDir, '03-gradient-background.png'),
+    gradOut,
     cssW,
     cssH,
     scale,
   );
+  console.log('✓', path.basename(gradOut));
 }
 
 // ---------------------------------------------------------------------------
@@ -201,30 +242,27 @@ console.log('✓ 01-qr.png');
   const cssH = Math.round(2.25 * 96); // 216
   const scale = 300 / 96;
   const out = path.join(outDir, '04-24-background.png');
-  screenshotHtml(
-    `<!doctype html><html><head><style>
-      ${fontFaces}
-      html,body{margin:0;width:${cssW}px;height:${cssH}px;overflow:hidden;background:${CHROMA}}
-      .w{
+  renderTransparentFromParts(
+    {
+      style: `.w{
         position:absolute; left:200px; top:30px;
         font-family:'Mountains of Christmas', Georgia, serif;
         font-weight:700; font-size:160px; line-height:0.9;
         color:${COLORS.gold}; margin:0;
-      }
-    </style></head><body><p class="w">24</p></body></html>`,
+      }`,
+      body: '<p class="w">24</p>',
+    },
     out,
     cssW,
     cssH,
     scale,
   );
-  chromaToAlpha(out, CHROMA_RGB, 60);
-  {
-    const png = PNG.sync.read(fs.readFileSync(out));
-    for (let i = 0; i < png.data.length; i += 4) {
-      if (png.data[i + 3] > 0) png.data[i + 3] = Math.round(png.data[i + 3] * 0.4);
-    }
-    fs.writeFileSync(out, PNG.sync.write(png));
+  // Soften for watermark use (dial further in Illustrator if needed)
+  const png = PNG.sync.read(fs.readFileSync(out));
+  for (let i = 0; i < png.data.length; i += 4) {
+    if (png.data[i + 3] > 0) png.data[i + 3] = Math.round(png.data[i + 3] * 0.4);
   }
+  fs.writeFileSync(out, PNG.sync.write(png));
 }
 
 // ---------------------------------------------------------------------------
@@ -268,25 +306,21 @@ console.log('✓ 01-qr.png');
   const cssH = Math.round(1.15 * 96);
   const scale = 300 / 96;
   const out = path.join(outDir, '09-christmas-adventure-calendar.png');
-  screenshotHtml(
-    `<!doctype html><html><head><style>
-      ${fontFaces}
-      html,body{margin:0;width:${cssW}px;height:${cssH}px;overflow:hidden;background:${CHROMA}}
-      h1{
+  renderTransparentFromParts(
+    {
+      style: `h1{
         margin:0; padding:0.04in 0.06in;
         font-family:'Mountains of Christmas', Georgia, serif;
         font-weight:700; font-size:0.29in; line-height:0.95;
         color:${COLORS.pine900};
-      }
-    </style></head><body>
-      <h1>Christmas<br/>Advent-ure<br/>Calendar</h1>
-    </body></html>`,
+      }`,
+      body: '<h1>Christmas<br/>Advent-ure<br/>Calendar</h1>',
+    },
     out,
     cssW,
     cssH,
     scale,
   );
-  chromaToAlpha(out, CHROMA_RGB, 50);
 }
 
 // ---------------------------------------------------------------------------
@@ -297,22 +331,21 @@ console.log('✓ 01-qr.png');
   const cssH = Math.round(0.28 * 96);
   const scale = 300 / 96;
   const out = path.join(outDir, '10-yellow-tag-background.png');
-  screenshotHtml(
-    `<!doctype html><html><head><style>
-      html,body{margin:0;width:${cssW}px;height:${cssH}px;overflow:hidden;background:${CHROMA}}
-      .pill{
+  renderTransparentFromParts(
+    {
+      style: `.pill{
         box-sizing:border-box;
         width:100%; height:100%;
         border-radius:0.05in;
         background: linear-gradient(135deg, ${COLORS.goldSoft}, ${COLORS.gold});
-      }
-    </style></head><body><div class="pill"></div></body></html>`,
+      }`,
+      body: '<div class="pill"></div>',
+    },
     out,
     cssW,
     cssH,
     scale,
   );
-  chromaToAlpha(out, CHROMA_RGB, 50);
 }
 
 // ---------------------------------------------------------------------------
