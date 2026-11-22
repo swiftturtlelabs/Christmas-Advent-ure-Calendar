@@ -45,6 +45,13 @@ export const STOCK_CALENDARS: StockCalendar[] = [
     tagline: 'Active missions, backyard exploring, and squad energy.',
     tone: 'Adventure',
   },
+  {
+    slug: '3lmn6wuzbi',
+    title: 'Chattanooga Christmas',
+    year: 2026,
+    tagline: 'Local lights, parades, concerts, and family traditions around the mountain.',
+    tone: 'Local',
+  },
 ];
 
 export function isStockCalendarSlug(slug: string): boolean {
