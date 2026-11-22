@@ -3,8 +3,8 @@
   Christmas Advent-ure Calendar — promo card (print)
   Open in Adobe Illustrator → File → Save As → Adobe Illustrator (*.ai)
 
-  Artboard: 3.75" × 2.25" (includes 0.125" bleed)
-  Trim to: 3.5" × 2"
+  Printer: trim 3.5" × 2" with 1/8" (0.125") bleed on all sides
+  Artboard: 3.75" × 2.25"
   Fonts: Poppins Bold/Medium, Mountains of Christmas Bold
   QR encodes: https://christmasadventurecalendar.com/
 -->
@@ -113,30 +113,45 @@
   </g>
 
   <!-- Layer: Typography -->
-  <g id="Typography" transform="translate(504, 174)">
+  <g id="Typography" transform="translate(504, 168.00000000000003)">
     <text
       font-family="Mountains of Christmas, Georgia, serif"
       font-weight="700"
-      font-size="87"
+      font-size="82.5"
       fill="#0b3d2e"
     >
       <tspan x="0" dy="0">Christmas</tspan>
-      <tspan x="0" dy="82.5">Advent-ure</tspan>
-      <tspan x="0" dy="82.5">Calendar</tspan>
+      <tspan x="0" dy="78">Advent-ure</tspan>
+      <tspan x="0" dy="78">Calendar</tspan>
     </text>
+
+    <!-- FOR FREE badge -->
+    <g id="For-Free-Badge" transform="translate(0, 252)">
+      <rect width="216" height="51.00000000000001" rx="3" fill="url(#chipGrad)"/>
+      <text
+        x="108" y="36"
+        text-anchor="middle"
+        font-family="Poppins, Arial, sans-serif"
+        font-weight="700"
+        font-size="25.500000000000004"
+        letter-spacing="0.1em"
+        fill="#06251c"
+      >FOR FREE</text>
+    </g>
+
     <text
-      y="285"
+      y="341.99999999999994"
       font-family="Poppins, Arial, sans-serif"
       font-weight="500"
-      font-size="33.6"
+      font-size="31.5"
       fill="#4d6358"
     >
       <tspan x="0" dy="0">A personalized Christmas</tspan>
-      <tspan x="0" dy="43.5">adventure, one day at a time.</tspan>
+      <tspan x="0" dy="40.5">adventure, one day at a time.</tspan>
     </text>
 
     <!-- Chips -->
-    <g id="Feature-Chips" transform="translate(0, 390)">
+    <g id="Feature-Chips" transform="translate(0, 426)">
       
     <g transform="translate(0, 0)">
       <rect width="155" height="28" rx="4" fill="url(#chipGrad)"/>

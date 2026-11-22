@@ -5,7 +5,8 @@
  * We write a structured SVG Illustrator opens natively (File → Open, then Save As .ai).
  * Also writes a layered Photoshop PSD for raster edits.
  *
- * Trim 3.5"×2" | Bleed 0.125" → artboard 3.75"×2.25"
+ * Printer spec: trim 3.5" × 2" (business card) + 1/8" (0.125") bleed
+ * Artboard / full bleed size: 3.75" × 2.25"
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -63,8 +64,8 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
   Christmas Advent-ure Calendar — promo card (print)
   Open in Adobe Illustrator → File → Save As → Adobe Illustrator (*.ai)
 
-  Artboard: ${WIDTH_IN}" × ${HEIGHT_IN}" (includes 0.125" bleed)
-  Trim to: 3.5" × 2"
+  Printer: trim 3.5" × 2" with 1/8" (0.125") bleed on all sides
+  Artboard: ${WIDTH_IN}" × ${HEIGHT_IN}"
   Fonts: Poppins Bold/Medium, Mountains of Christmas Bold
   QR encodes: ${HOME_URL}
 -->
@@ -173,30 +174,45 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
   </g>
 
   <!-- Layer: Typography -->
-  <g id="Typography" transform="translate(${inPx(0.38 + 1.12 + 0.18)}, ${inPx(0.58)})">
+  <g id="Typography" transform="translate(${inPx(0.38 + 1.12 + 0.18)}, ${inPx(0.56)})">
     <text
       font-family="Mountains of Christmas, Georgia, serif"
       font-weight="700"
-      font-size="${inPx(0.29)}"
+      font-size="${inPx(0.275)}"
       fill="${COLORS.pine900}"
     >
       <tspan x="0" dy="0">Christmas</tspan>
-      <tspan x="0" dy="${inPx(0.275)}">Advent-ure</tspan>
-      <tspan x="0" dy="${inPx(0.275)}">Calendar</tspan>
+      <tspan x="0" dy="${inPx(0.26)}">Advent-ure</tspan>
+      <tspan x="0" dy="${inPx(0.26)}">Calendar</tspan>
     </text>
+
+    <!-- FOR FREE badge -->
+    <g id="For-Free-Badge" transform="translate(0, ${inPx(0.84)})">
+      <rect width="${inPx(0.72)}" height="${inPx(0.17)}" rx="3" fill="url(#chipGrad)"/>
+      <text
+        x="${inPx(0.36)}" y="${inPx(0.12)}"
+        text-anchor="middle"
+        font-family="Poppins, Arial, sans-serif"
+        font-weight="700"
+        font-size="${inPx(0.085)}"
+        letter-spacing="0.1em"
+        fill="${COLORS.pine950}"
+      >FOR FREE</text>
+    </g>
+
     <text
-      y="${inPx(0.95)}"
+      y="${inPx(1.14)}"
       font-family="Poppins, Arial, sans-serif"
       font-weight="500"
-      font-size="${inPx(0.112)}"
+      font-size="${inPx(0.105)}"
       fill="${COLORS.inkMuted}"
     >
       <tspan x="0" dy="0">A personalized Christmas</tspan>
-      <tspan x="0" dy="${inPx(0.145)}">adventure, one day at a time.</tspan>
+      <tspan x="0" dy="${inPx(0.135)}">adventure, one day at a time.</tspan>
     </text>
 
     <!-- Chips -->
-    <g id="Feature-Chips" transform="translate(0, ${inPx(1.3)})">
+    <g id="Feature-Chips" transform="translate(0, ${inPx(1.42)})">
       ${chip(0, 0, 'Daily surprises', 155)}
       ${chip(165, 0, 'Secret riddles', 145)}
       ${chip(0, 42, 'Printable QR codes for each day', 310)}
@@ -377,20 +393,23 @@ console.log('Wrote', path.basename(psdPath), `(${psdBuffer.byteLength} bytes) �
 const readme = `Adobe files — Christmas Advent-ure Calendar promo card
 =====================================================
 
+PRINTER SPECS
+  Trim:  3.5" × 2" (business card)
+  Bleed: 1/8" (0.125") on all sides
+  Full artwork / artboard: 3.75" × 2.25"
+
 RECOMMENDED: Christmas-Adventure-Calendar-promo-card.svg
-  • Best for this project (single print card with type + QR)
   • Open in Adobe Illustrator
   • Then: File → Save As → Adobe Illustrator (*.ai)
-  • Artboard is 3.75" × 2.25" (0.125" bleed). Trim to 3.5" × 2".
   • Install fonts for full editability: Poppins, Mountains of Christmas
   • Blue dashed rect = trim guide (hide/delete before sending to press)
+  • Includes gold "FOR FREE" badge
 
 ALSO: Christmas-Adventure-Calendar-promo-card.psd
   • Photoshop document @ 300 DPI
   • Layers: Card Artwork, QR Code (swap), Flat Proof (hidden reference)
 
-ALREADY HAD: Christmas-Adventure-Calendar-promo-card.pdf
-  • Print-ready PDF (fonts embedded) — fine for most print shops
+PDF / PNG proofs also in this folder (fonts embedded in PDF)
 
 QR encodes: ${HOME_URL}
 URL shown: ${DISPLAY_URL}
