@@ -2139,11 +2139,9 @@ input[type='radio']:focus-visible {
 }
 
 @media (max-width: 520px) {
-  /* Lock document scroll for immersive public pages + home */
+  /* Lock document scroll only for immersive public calendar/day */
   html:has(.phone-stage),
-  body:has(.phone-stage),
-  html:has(.landing),
-  body:has(.landing) {
+  body:has(.phone-stage) {
     height: 100%;
     overflow: hidden;
     overscroll-behavior: none;
@@ -2155,7 +2153,6 @@ input[type='radio']:focus-visible {
     position: fixed;
     inset: 0;
     width: 100%;
-    height: 100%;
     height: 100dvh;
     min-height: 0;
     padding: 0;
@@ -2188,7 +2185,7 @@ input[type='radio']:focus-visible {
   }
 
   .phone-frame__screen .page.public-day {
-    padding: 0.75rem 0.75rem max(0.75rem, env(safe-area-inset-bottom, 0px));
+    padding: 1rem 0.75rem max(1rem, env(safe-area-inset-bottom, 0px));
     overflow: hidden;
     overscroll-behavior: none;
   }
@@ -2200,7 +2197,7 @@ input[type='radio']:focus-visible {
   }
 
   .public-calendar .public-header {
-    margin: max(0.55rem, env(safe-area-inset-top, 0px)) -0.4rem 0.55rem;
+    margin: max(0.85rem, env(safe-area-inset-top, 0px)) -0.4rem 0.55rem;
     padding: 0.8rem 0.9rem;
     /* Yellow banner — reserved for future theme options */
     /* background: rgba(245, 192, 76, 0.42); */
@@ -2231,7 +2228,7 @@ input[type='radio']:focus-visible {
     column-gap: 1.25rem;
     row-gap: 0.55rem;
     padding-inline: 1rem;
-    padding-block: clamp(1.25rem, 5%, 3.25rem) clamp(1rem, 4%, 2.75rem);
+    padding-block: clamp(1.5rem, 6%, 3.25rem) clamp(1.25rem, 5%, 2.75rem);
     max-width: none;
     width: 100%;
   }
@@ -2249,80 +2246,49 @@ input[type='radio']:focus-visible {
     height: clamp(1rem, 4.5vw, 1.35rem);
   }
 
-  /* Home: one-screen composition (header + hero + footer) */
+  /*
+   * Home: trim excess padding so header + hero + donate fit without
+   * locking/clipping the layout (which hid the footer and floated the card).
+   */
   .layout:has(.landing) {
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden;
+    min-height: 100dvh;
   }
 
   .layout:has(.landing) .site-header {
-    position: relative;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .layout:has(.landing) .brand {
+    font-size: 1.25rem;
+  }
+
+  .layout:has(.landing) .site-header nav {
+    gap: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .layout:has(.landing) main {
-    flex: 1;
-    min-height: 0;
-    padding: 0.75rem 1rem;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    padding: 1rem 1rem 0.5rem;
   }
 
   .layout:has(.landing) .site-footer {
-    flex-shrink: 0;
-    padding: 0.5rem 1rem max(0.75rem, env(safe-area-inset-bottom, 0px));
+    padding: 0.5rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
   }
 
   .landing {
-    flex: 1;
     min-height: 0;
-    height: auto;
     padding-top: 0;
-    overflow: hidden;
-  }
-
-  .landing .hero {
-    padding: 1.25rem 1rem;
-    max-height: 100%;
-    overflow: hidden;
-  }
-
-  .landing .hero h1 {
-    font-size: clamp(1.65rem, 7vw, 2.25rem);
-  }
-
-  .landing .hero p {
-    font-size: 0.95rem;
-    margin: 0.5rem 0 0;
-  }
-
-  .landing .feature-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.45rem;
-    margin: 0.85rem 0;
-  }
-
-  .landing .feature-chip {
-    padding: 0.55rem 0.3rem;
-    font-size: 0.68rem;
-  }
-
-  .landing .hero-badge {
-    margin-bottom: 0.65rem;
-  }
-
-  .landing .landing-samples {
-    margin-top: 0.75rem;
-  }
-
-  .calendar-item {
-    flex-direction: column;
+    align-content: center;
   }
 
   .hero {
     padding: 1.75rem 1.25rem;
+  }
+
+  .calendar-item {
+    flex-direction: column;
   }
 
   .page.editor .editor-header-actions .btn {
