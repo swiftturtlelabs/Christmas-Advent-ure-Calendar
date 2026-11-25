@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 interface PhoneFrameProps {
   children: ReactNode;
@@ -6,6 +6,10 @@ interface PhoneFrameProps {
 
 /** Desktop/tablet: phone bezel with mobile layout inside. Real phones: unframed. */
 export function PhoneFrame({ children }: PhoneFrameProps) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="phone-stage">
       <div className="phone-frame" aria-label="Phone preview">
