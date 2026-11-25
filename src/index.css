@@ -335,10 +335,25 @@ main {
 }
 
 .landing {
-  min-height: calc(100vh - 100px);
+  min-height: 0;
   display: grid;
   place-items: center;
-  padding-top: 2rem;
+  padding-top: 1.25rem;
+}
+
+/* Home: keep donate tucked under the hero instead of pinned to the viewport bottom */
+.layout:has(.landing) {
+  min-height: 100dvh;
+}
+
+.layout:has(.landing) main {
+  flex: 0 1 auto;
+  padding-bottom: 0.75rem;
+}
+
+.layout:has(.landing) .site-footer {
+  padding-top: 0.15rem;
+  padding-bottom: 1rem;
 }
 
 .hero {
@@ -2250,10 +2265,6 @@ input[type='radio']:focus-visible {
    * Home: trim excess padding so header + hero + donate fit without
    * locking/clipping the layout (which hid the footer and floated the card).
    */
-  .layout:has(.landing) {
-    min-height: 100dvh;
-  }
-
   .layout:has(.landing) .site-header {
     flex-wrap: wrap;
     gap: 0.35rem 0.75rem;
@@ -2270,17 +2281,16 @@ input[type='radio']:focus-visible {
   }
 
   .layout:has(.landing) main {
-    padding: 1rem 1rem 0.5rem;
+    padding: 1rem 1rem 0.35rem;
   }
 
   .layout:has(.landing) .site-footer {
-    padding: 0.5rem 1rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+    padding: 0.1rem 1rem max(0.75rem, env(safe-area-inset-bottom, 0px));
   }
 
   .landing {
-    min-height: 0;
     padding-top: 0;
-    align-content: center;
+    align-content: start;
   }
 
   .hero {
